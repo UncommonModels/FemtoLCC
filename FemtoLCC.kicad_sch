@@ -7389,12 +7389,6 @@
 		(uuid "7ba6f543-71f0-4d8b-a802-6325e3d3a15f")
 	)
 	(junction
-		(at 62.23 195.58)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "7cd7d3f7-e852-4abf-bd04-3c42db50a706")
-	)
-	(junction
 		(at 82.55 90.17)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7423,12 +7417,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b3f80527-23f8-4be0-9f8e-aba86ff92fa6")
-	)
-	(junction
-		(at 74.93 195.58)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b6000964-1f5c-4886-b085-5e369dd54046")
 	)
 	(junction
 		(at 104.14 59.69)
@@ -7467,12 +7455,6 @@
 		(uuid "eed73410-e015-4b6a-aa89-76b7fa68ad29")
 	)
 	(junction
-		(at 48.26 195.58)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f69d9909-60ac-4506-b412-ae1514f1f57a")
-	)
-	(junction
 		(at 156.21 109.22)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7485,28 +7467,20 @@
 		(uuid "ff5a97ba-405c-4346-b9dd-065a36936d09")
 	)
 	(no_connect
+		(at 21.59 186.69)
+		(uuid "42251d88-0929-462f-b19b-df2def4c3d2a")
+	)
+	(no_connect
+		(at 74.93 186.69)
+		(uuid "751d477c-1f7b-4525-80ce-eeba12321837")
+	)
+	(no_connect
+		(at 48.26 186.69)
+		(uuid "c5bac899-ece2-4dbf-860a-b30ef6d67414")
+	)
+	(no_connect
 		(at 143.51 132.08)
 		(uuid "e05197a9-9096-41a7-a860-db3a662a5562")
-	)
-	(wire
-		(pts
-			(xy 48.26 194.31) (xy 48.26 195.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "00237aaa-0950-495d-a325-794afc7b11e9")
-	)
-	(wire
-		(pts
-			(xy 48.26 195.58) (xy 62.23 195.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "003802a1-1e87-4452-81f9-d8b5c43727aa")
 	)
 	(wire
 		(pts
@@ -7577,16 +7551,6 @@
 			(type default)
 		)
 		(uuid "0b1caf42-1308-49b0-80f7-ea7f58c49b84")
-	)
-	(wire
-		(pts
-			(xy 101.6 195.58) (xy 74.93 195.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0b4521ef-19da-4187-86a7-dea2fffe5f61")
 	)
 	(wire
 		(pts
@@ -8440,16 +8404,6 @@
 	)
 	(wire
 		(pts
-			(xy 74.93 194.31) (xy 74.93 195.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c141c842-0cbe-490a-9fae-cbc22b53ee8e")
-	)
-	(wire
-		(pts
 			(xy 53.34 107.95) (xy 54.61 107.95)
 		)
 		(stroke
@@ -8610,16 +8564,6 @@
 	)
 	(wire
 		(pts
-			(xy 21.59 195.58) (xy 48.26 195.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dce57964-c2d6-4b67-bc19-0e5c953c8a00")
-	)
-	(wire
-		(pts
 			(xy 82.55 90.17) (xy 101.6 90.17)
 		)
 		(stroke
@@ -8677,16 +8621,6 @@
 			(type default)
 		)
 		(uuid "e47015f0-e220-4117-af56-5c5b09a4894c")
-	)
-	(wire
-		(pts
-			(xy 21.59 194.31) (xy 21.59 195.58)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e8568ef2-7a61-41cc-90f0-ef1665b965cc")
 	)
 	(wire
 		(pts
@@ -8770,7 +8704,7 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 195.58) (xy 74.93 195.58)
+			(xy 62.23 195.58) (xy 101.6 195.58)
 		)
 		(stroke
 			(width 0)
@@ -11283,88 +11217,6 @@
 			(project "FemtoLCC"
 				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576"
 					(reference "R27")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 21.59 190.5 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp yes)
-		(fields_autoplaced yes)
-		(uuid "4777ce2f-f1d4-4a32-8a9c-605380c6149e")
-		(property "Reference" "R24"
-			(at 24.13 189.2299 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "R"
-			(at 24.13 191.7699 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_1206_3216Metric"
-			(at 19.812 190.5 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 21.59 190.5 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 21.59 190.5 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "625eae09-233e-4c81-803e-7cbf748161cb")
-		)
-		(pin "2"
-			(uuid "fb964650-d278-4569-9a9b-e9bf0ef1ec62")
-		)
-		(instances
-			(project "FemtoLCC"
-				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576"
-					(reference "R24")
 					(unit 1)
 				)
 			)
@@ -14679,88 +14531,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 48.26 190.5 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp yes)
-		(fields_autoplaced yes)
-		(uuid "b65d2af0-9b7b-49c3-aefb-9697f57fbd18")
-		(property "Reference" "R25"
-			(at 50.8 189.2299 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "R"
-			(at 50.8 191.7699 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_1206_3216Metric"
-			(at 46.482 190.5 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 48.26 190.5 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 48.26 190.5 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "864924ae-51a7-4229-8b5a-cd7eb3a31cdd")
-		)
-		(pin "2"
-			(uuid "53abd9d8-a687-43b5-b039-3e1f69c3955e")
-		)
-		(instances
-			(project "FemtoLCC"
-				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576"
-					(reference "R25")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 64.77 158.75 0)
 		(unit 1)
@@ -15287,88 +15057,6 @@
 			(project "FemtoLCC"
 				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576"
 					(reference "R23")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 74.93 190.5 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom no)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp yes)
-		(fields_autoplaced yes)
-		(uuid "d7b73368-f281-4467-8cca-10988a7d6cf2")
-		(property "Reference" "R26"
-			(at 77.47 189.2299 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "R"
-			(at 77.47 191.7699 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_1206_3216Metric"
-			(at 73.152 190.5 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 74.93 190.5 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 74.93 190.5 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "0b583c3e-1bc3-4b5c-be79-0f1b4941aa10")
-		)
-		(pin "2"
-			(uuid "b1419aee-d590-4059-9000-4d01dd990762")
-		)
-		(instances
-			(project "FemtoLCC"
-				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576"
-					(reference "R26")
 					(unit 1)
 				)
 			)
@@ -16221,7 +15909,7 @@
 		(instances
 			(project "FemtoLCC"
 				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576"
-					(page "7")
+					(page "6")
 				)
 			)
 		)

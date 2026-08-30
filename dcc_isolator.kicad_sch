@@ -495,7 +495,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Isolator:HCPL-2630"
+		(symbol "Isolator:HCPL-0630"
 			(pin_names
 				(offset 0)
 			)
@@ -514,8 +514,8 @@
 					)
 				)
 			)
-			(property "Value" "HCPL-2630"
-				(at 7.62 11.43 0)
+			(property "Value" "HCPL-0630"
+				(at 7.874 11.43 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(effects
@@ -524,8 +524,8 @@
 					)
 				)
 			)
-			(property "Footprint" "Package_DIP:DIP-8_W7.62mm"
-				(at 2.54 -18.288 0)
+			(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+				(at 0 -17.78 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -536,7 +536,7 @@
 				)
 			)
 			(property "Datasheet" "https://docs.broadcom.com/docs/AV02-0940EN"
-				(at -10.16 8.89 0)
+				(at -21.59 15.24 0)
 				(show_name no)
 				(do_not_autoplace no)
 				(hide yes)
@@ -546,7 +546,7 @@
 					)
 				)
 			)
-			(property "Description" "Dual High Speed LSTTL/TTL Compatible Optocoupler, dV/dt 5000/us, VCM 1000, max 7V VCC, DIP-8"
+			(property "Description" "Dual High Speed LSTTL/TTL Compatible Optocoupler, dV/dt 5000/us, VCM 1000, max 7V VCC, SOIC-8"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -568,7 +568,7 @@
 					)
 				)
 			)
-			(property "ki_fp_filters" "DIP*W7.62mm*"
+			(property "ki_fp_filters" "SOIC*3.9x4.9mm?P1.27mm*"
 				(at 0 0 0)
 				(show_name no)
 				(do_not_autoplace no)
@@ -579,7 +579,7 @@
 					)
 				)
 			)
-			(symbol "HCPL-2630_1_1"
+			(symbol "HCPL-0630_0_1"
 				(rectangle
 					(start -5.08 10.16)
 					(end 5.08 -10.16)
@@ -591,6 +591,8 @@
 						(type background)
 					)
 				)
+			)
+			(symbol "HCPL-0630_1_1"
 				(polyline
 					(pts
 						(xy -4.953 7.62) (xy -2.413 7.62) (xy -2.413 4.318)
@@ -879,10 +881,10 @@
 				)
 				(polyline
 					(pts
-						(xy 4.699 5.08) (xy 5.08 5.08)
+						(xy 4.699 5.08) (xy 5.334 5.08)
 					)
 					(stroke
-						(width 0)
+						(width 0.254)
 						(type default)
 					)
 					(fill
@@ -894,7 +896,7 @@
 						(xy 4.699 -5.08) (xy 5.207 -5.08)
 					)
 					(stroke
-						(width 0)
+						(width 0.254)
 						(type default)
 					)
 					(fill
@@ -1738,17 +1740,6 @@
 		)
 		(uuid "12de8426-6213-428e-97fd-e398831c613d")
 	)
-	(hierarchical_label "raw_dcc_n"
-		(shape input)
-		(at 110.49 55.88 180)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "6437461b-2e6f-4acb-a43a-eb5212871eeb")
-	)
 	(hierarchical_label "dcc_n"
 		(shape output)
 		(at 146.05 58.42 0)
@@ -1770,6 +1761,17 @@
 			(justify right)
 		)
 		(uuid "9bcb9d68-35b7-45c8-9a7b-1ec7a5ed0a7b")
+	)
+	(hierarchical_label "raw_dcc_n"
+		(shape input)
+		(at 110.49 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "9c9a065f-95ab-4249-9671-81676562af83")
 	)
 	(hierarchical_label "raw_dcc_n"
 		(shape input)
@@ -1823,7 +1825,7 @@
 			(justify right bottom)
 		)
 		(uuid "c19178cf-3f9d-44cd-98ac-a1e4b463dc50")
-		(property "Net Class" "Track Power"
+		(property "Netclass" "Track Power"
 			(at 88.392 66.548 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -2019,6 +2021,106 @@
 			(project "FemtoLCC"
 				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576/bb316871-c1c3-46df-a6c4-3a96f474b6b8"
 					(reference "#PWR064")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Isolator:HCPL-0630")
+		(at 118.11 53.34 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "14df7215-be49-499e-bf2c-f7d2106bfb12")
+		(property "Reference" "U12"
+			(at 121.2281 38.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "HCPL-0630"
+			(at 121.2281 40.64 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+			(at 118.11 71.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://docs.broadcom.com/docs/AV02-0940EN"
+			(at 96.52 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Dual High Speed LSTTL/TTL Compatible Optocoupler, dV/dt 5000/us, VCM 1000, max 7V VCC, SOIC-8"
+			(at 118.11 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "8"
+			(uuid "47905436-8547-4450-9140-d17ae2f84960")
+		)
+		(pin "7"
+			(uuid "a5b16374-1b76-4be8-bee3-9e9e86c883de")
+		)
+		(pin "6"
+			(uuid "aab23b2d-a7ac-43db-babb-1ca153f0117a")
+		)
+		(pin "5"
+			(uuid "27ecf6fc-04c7-4f0a-bb06-ae30337eef8c")
+		)
+		(pin "4"
+			(uuid "fa0b5125-db43-47ad-a7e7-b2ab33b51139")
+		)
+		(pin "3"
+			(uuid "1a66a1ba-6660-4e28-9faa-eb6ac12b1f99")
+		)
+		(pin "2"
+			(uuid "4d7fcd63-a0fc-49bc-870b-a5c6095b7a65")
+		)
+		(pin "1"
+			(uuid "5e9808c2-6a8f-4498-84bd-305f45273893")
+		)
+		(instances
+			(project "FemtoLCC"
+				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576/bb316871-c1c3-46df-a6c4-3a96f474b6b8"
+					(reference "U12")
 					(unit 1)
 				)
 			)
@@ -2931,106 +3033,6 @@
 			(project "FemtoLCC"
 				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576/bb316871-c1c3-46df-a6c4-3a96f474b6b8"
 					(reference "#PWR070")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Isolator:HCPL-2630")
-		(at 118.11 53.34 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "eaff0b12-bd9d-4b21-80ac-43c39f4e6cf0")
-		(property "Reference" "U16"
-			(at 121.2281 38.1 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "HCPL-2630"
-			(at 121.2281 40.64 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_DIP:DIP-8_W7.62mm"
-			(at 120.65 71.628 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://docs.broadcom.com/docs/AV02-0940EN"
-			(at 107.95 44.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Dual High Speed LSTTL/TTL Compatible Optocoupler, dV/dt 5000/us, VCM 1000, max 7V VCC, DIP-8"
-			(at 118.11 53.34 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "3"
-			(uuid "dc8aa908-320a-4ad5-ad70-9a79a42ab44f")
-		)
-		(pin "1"
-			(uuid "0842726c-570f-4241-a2a0-0ea8af92d3b1")
-		)
-		(pin "2"
-			(uuid "f752e0db-9569-46e0-a831-d8e555377a12")
-		)
-		(pin "4"
-			(uuid "be1cd0c5-3b08-45f0-8825-10994ac04bd5")
-		)
-		(pin "8"
-			(uuid "129c387d-94b3-4b95-83a7-801917efd88a")
-		)
-		(pin "5"
-			(uuid "9bb7a22a-1ccf-45b3-8c56-b238b0811ca8")
-		)
-		(pin "7"
-			(uuid "4ec80624-1bc9-4bbf-a7eb-66b1d728d4f0")
-		)
-		(pin "6"
-			(uuid "b5912c19-c995-48fa-a22e-ddd6cc6e3a27")
-		)
-		(instances
-			(project "FemtoLCC"
-				(path "/52455d2f-97dd-4d4c-8361-4f75b5320576/bb316871-c1c3-46df-a6c4-3a96f474b6b8"
-					(reference "U16")
 					(unit 1)
 				)
 			)
