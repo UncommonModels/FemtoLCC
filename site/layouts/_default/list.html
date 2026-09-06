@@ -1,0 +1,14 @@
+{{ define "main" }}
+  <article class="prose">
+    <h1>{{ .Title }}</h1>
+    {{ .Content }}
+    <ul class="cardlist">
+      {{ range .Pages.ByWeight }}
+        <li>
+          <a href="{{ .RelPermalink }}"><strong>{{ .Title }}</strong></a>
+          {{ with .Description }}<span>{{ . }}</span>{{ end }}
+        </li>
+      {{ end }}
+    </ul>
+  </article>
+{{ end }}

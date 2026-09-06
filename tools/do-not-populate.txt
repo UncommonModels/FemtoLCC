@@ -1,0 +1,11 @@
+# Designators deliberately left unpopulated.
+#
+# These are excluded from the assembly BOM and the CPL, so JLC neither sources
+# nor places them. They remain in FemtoLCC-parts-reference.csv, which documents
+# every position on the board.
+#
+# One designator per line; text after the designator is the reason.
+# Setting DNP on the symbol in KiCad has the same effect - both exports already
+# pass --exclude-dnp - so prefer that when the change is permanent.
+
+R5    47k 0402 - unpopulated by design

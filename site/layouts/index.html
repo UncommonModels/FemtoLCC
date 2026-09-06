@@ -1,0 +1,17 @@
+{{ define "main" }}
+  <article class="prose">
+    <div class="hero">
+      <h1>FemtoLCC</h1>
+      <p class="lede">{{ .Site.Params.description }}</p>
+      <div class="specrow">
+        <div><span class="k">Board</span><span class="v">{{ .Site.Params.boardSize }}</span><span class="sub">{{ .Site.Params.boardSizeIn }}</span></div>
+        <div><span class="k">Layers</span><span class="v">{{ .Site.Params.layers }}</span><span class="sub">1 oz inner &amp; outer</span></div>
+        <div><span class="k">MCU</span><span class="v">ESP32-C6-WROOM-1</span></div>
+        <div><span class="k">Bus</span><span class="v">CAN / LCC</span></div>
+      </div>
+    </div>
+    <img class="boardshot" src="{{ "img/render-top.png" | relURL }}"
+         alt="Rendered top view of the FemtoLCC board">
+    {{ .Content }}
+  </article>
+{{ end }}

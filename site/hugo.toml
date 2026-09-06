@@ -1,0 +1,45 @@
+baseURL = 'https://uncommonmodels.github.io/FemtoLCC/'
+languageCode = 'en-us'
+title = 'FemtoLCC'
+enableGitInfo = false
+
+[params]
+  description = 'An ESP32-C6 based LCC node with four block driver channels and an isolated DCC input.'
+  repo = 'https://github.com/UncommonModels/FemtoLCC'
+  org = 'Uncommon Models'
+  orgURL = 'https://uncommonmodels.com'
+  boardSize = '3.00 × 3.75 in'
+  boardSizeIn = '76.20 × 95.25 mm'
+  layers = 4
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.highlight]
+  noClasses = false
+  style = 'github'
+
+[[menu.main]]
+  name = 'Overview'
+  url = '/'
+  weight = 1
+
+[[menu.main]]
+  name = 'Hardware'
+  url = '/docs/hardware/'
+  weight = 2
+
+[[menu.main]]
+  name = 'Mechanical'
+  url = '/docs/mechanical/'
+  weight = 3
+
+[[menu.main]]
+  name = 'Ordering'
+  url = '/docs/production/'
+  weight = 4
+
+[[menu.main]]
+  name = 'Build workflow'
+  url = '/docs/workflow/'
+  weight = 5

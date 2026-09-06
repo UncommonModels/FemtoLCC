@@ -1,0 +1,12 @@
+<aside class="sidebar">
+  <nav>
+    <p class="nav-label">Documentation</p>
+    <ul>
+      {{ $current := .RelPermalink }}
+      {{ range .Site.Menus.main }}
+        {{ $url := .URL | relURL }}
+        <li><a href="{{ $url }}"{{ if eq $current $url }} class="active"{{ end }}>{{ .Name }}</a></li>
+      {{ end }}
+    </ul>
+  </nav>
+</aside>

@@ -32,3 +32,24 @@ fp-info-cache
 
 # Replicate Layout Plugin Log
 replicate_layout.log
+# Hugo documentation site
+site/public/
+site/resources/
+site/.hugo_build.lock
+
+# Generated design-check reports
+*-erc.rpt
+*-drc.rpt
+
+# Hand-maintained LCSC part assignments: an input to the BOM/CPL tools, not an export
+!tools/lcsc-parts.csv
+
+# Firmware build output (arduino-cli --build-path)
+software/build/
+
+# Python bytecode caches
+__pycache__/
+*.pyc
+
+# JLCPCB upload staging: duplicates of files already under production/
+production/upload/

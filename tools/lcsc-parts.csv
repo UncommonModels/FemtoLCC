@@ -1,0 +1,49 @@
+# JLCPCB / LCSC part assignments for FemtoLCC, keyed on the schematic Value and
+# the footprint name with its library prefix stripped.
+#
+# Picked against JLC stock. Basic parts are preferred (no extra feeder charge),
+# then Preferred, then Extended with healthy stock. Rows with an empty LCSC
+# column are deliberately unassigned - see the Note column.
+#
+# Stock figures behind these picks are a periodic mirror of JLC's catalogue, not
+# a live feed. Re-check before ordering with: make stock-check
+#
+Value,Footprint,LCSC,MPN,Manufacturer,Assemble,Note
+C100n,C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,C49678,CC0805KRX7R9BB104,YAGEO,,Basic. 50V X7R 10%
+C100n VM,C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,C49678,CC0805KRX7R9BB104,YAGEO,,Basic. 50V rating for the VM rail
+C22n,C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,C1729,CL21B223KBANNNC,Samsung,,Basic. 50V X7R 10%
+C1u,C_0805_2012Metric_Pad1.18x1.45mm_HandSolder,C28323,CL21B105KBFNNNE,Samsung,,Basic. 50V X7R
+C10u,C_1206_3216Metric_Pad1.33x1.80mm_HandSolder,C13585,CL31A106KBHNNNE,Samsung,,Basic. 50V X5R
+C10u VM,C_1206_3216Metric_Pad1.33x1.80mm_HandSolder,C13585,CL31A106KBHNNNE,Samsung,,Basic. 50V X5R gives DC-bias headroom on VM
+D_Schottky,D_SMA_Handsoldering,C8678,SS34,MDD,,Basic. 40V 3A schottky
+D10V,D_SOD-323_HandSoldering,C19077446,BZT52C10S,JSMSEMI,,Preferred. 10V zener
+LED,LED_0603_1608Metric,C2286,KT-0603R,Hubei KENTO,,Basic. Red
+AO3401A,SOT-23,C15127,AO3401A,Alpha & Omega,,Basic. P-channel MOSFET
+R120,R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,C17437,0805W8F1200T5E,UNI-ROYAL,,Basic. 1% - CAN termination
+R47k,R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,C17713,0805W8F4702T5E,UNI-ROYAL,,Basic. 1%
+R10k,R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,C17414,0805W8F1002T5E,UNI-ROYAL,,Basic. 1%
+R1k430,R_0805_2012Metric_Pad1.20x1.40mm_HandSolder,C327311,RC0805FR-071K43L-S,YAGEO,,E96 value 1% - thinner stock than an E24 value; run make stock-check
+R2.2k,R_0402_1005Metric,C25879,0402WGF2201TCE,UNI-ROYAL,,Basic. 1%
+R47k,R_0402_1005Metric,C25792,0402WGF4702TCE,UNI-ROYAL,,Basic. 1%
+R5.1k,R_0402_1005Metric,C25905,0402WGF5101TCE,UNI-ROYAL,,Basic. 1%
+R100,R_0402_1005Metric,C25076,0402WGF1000TCE,UNI-ROYAL,,Basic. 1%
+R2k 1W,R_2512_6332Metric_Pad1.40x3.35mm_HandSolder,C469653,AC2512FK-072KL,YAGEO,,Anti-surge series as originally specified
+NCP1117-3.3_SOT223,SOT-223-3_TabPin2,C26537,NCP1117ST33T3G,onsemi,,
+NCP1117-5.0_SOT223,SOT-223-3_TabPin2,C17314,NCP1117ST50T3G,onsemi,,
+MCP2562-E-SN,SOIC-8_3.9x4.9mm_P1.27mm,C191417,MCP2562T-E/SN,Microchip,,Tape-and-reel of the specified die
+HCPL-0630,SOIC-8_3.9x4.9mm_P1.27mm,C20027,HCPL-0630-500E,Broadcom,,Genuine Broadcom part
+MCP23018x-x-SO,SOIC-28W_7.5x17.9mm_P1.27mm,C629441,MCP23018T-E/SO,Microchip,,Low stock - run make stock-check before a build
+SN74HC253DR,SO-16_3.9x9.9mm_P1.27mm,C61421,SN74HC253DR,Texas Instruments,,Low stock and 4 per board - run make stock-check
+DRV8874PWPR,PWP0016J_NV,C1855818,DRV8874PWPR,Texas Instruments,,
+ESP32-C6-WROOM-1,ESP32-C6-WROOM-1,C6034714,ESP32-C6-WROOM-1-N4,Espressif,,4MB flash variant - confirm against firmware
+RJHSE508002,AMPHENOL_RJHSE508002,,RJHSE-5080-02,Amphenol,no,"2-PORT jack (8P, 2 port). Not stocked at JLC - source elsewhere and hand-fit"
+SM04B-SRSS-TB,JST_SH_BM04B-SRSS-TB_1x04-1MP_P1.00mm_Vertical,C160390,BM04B-SRSS-TB(LF)(SN),JST,,"BM = top-entry vertical, matching the footprint. SM is side-entry"
+USB_C_Plug_USB2.0,USB_C_Receptacle_G-Switch_GT-USB-7051x,C2843970,GT-USB-7051A,G-Switch,,
+UART Header,PinHeader_1x06_P2.54mm_Vertical,,,,,Through-hole - not assembled by JLC
+PMOD,PinSocket_2x06_P2.54mm_Horizontal,C2897426,PM254-2-06-W-8.5,,,2x6 right-angle socket. Through-hole: needs JLC through-hole assembly
+Conn_01x02,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",C474952,KF128-5.08-2P-AA,Kefa,,"Generic 5.08mm screw terminal, replaces Phoenix MKDS. Through-hole"
+Conn_01x03,"PhoenixContact_MCV_1,5_3-G-3.5_1x03_P3.50mm_Vertical",C441322,KF2EDGV-3.5-3P,Kefa,,"Generic 3.5mm pluggable header, replaces Phoenix MCV. Through-hole"
+Conn_01x02,"PhoenixContact_MCV_1,5_2-G-3.5_1x02_P3.50mm_Vertical",C441321,KF2EDGV-3.5-2P,Kefa,,"Generic 3.5mm pluggable header, replaces Phoenix MCV. Through-hole"
+Jumper_2_Open,TestPoint_2Pads_Pitch2.54mm_Drill0.8mm,,,,,Solder jumper - no part fitted
+SW_Push,SW_Push_1P1T_XKB_TS-1187A,C318884,TS-1187A-B-A-B,XKB Connection,,Basic. 5.1x5.1mm 4-pin tactile switch - ESP32 EN reset
+MountingHole_Pad,MountingHole_4.3mm_M4_Pad_Via,,,,no,"M4 mounting hole, not a part"
