@@ -5,7 +5,7 @@
 	(uuid "52455d2f-97dd-4d4c-8361-4f75b5320576")
 	(paper "USLetter")
 	(title_block
-		(title "Femto LCC Booster")
+		(title "FemtoLCC Booster")
 		(date "2025-10-31")
 		(rev "1")
 		(company "TMRC & Uncommon Models")
