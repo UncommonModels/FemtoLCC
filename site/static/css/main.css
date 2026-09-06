@@ -1,33 +1,11 @@
 /* FemtoLCC documentation.
+   Palette, title bar, buttons and card surface come from the shared brand layer
+   at https://www.uncommonmodels.com/css/brand.css (linked in baseof.html before
+   this file). Only what is specific to these docs lives here. */
+
+/* FemtoLCC documentation.
    Palette, type and card treatment follow uncommonmodels.com so the two read as
    one property. The brand site is dark only, so this is too - no light variant. */
-
-:root {
-  color-scheme: dark;
-
-  --bg: #0f0f0f;
-  --panel: #1b1b1b;
-  --panel-2: #2a2a2a;
-  --text: #e6e6e6;
-  --text-muted: #a6a6a6;
-  --nav-text: #e4e7eb;
-  --accent: #f5a524;
-  --accent-hi: #ffca64;
-  --accent-2: #4db6ff;
-
-  --line: rgba(255, 255, 255, 0.08);
-  --line-hi: rgba(255, 255, 255, 0.14);
-  --wash: rgba(255, 255, 255, 0.06);
-  --accent-wash: rgba(255, 202, 100, 0.12);
-
-  --radius: 12px;
-  --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-  --shadow-hi: 0 18px 40px rgba(0, 0, 0, 0.45);
-
-  --sans: "Jost", system-ui, sans-serif;
-  --display: "League Spartan", "Jost", sans-serif;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-}
 
 * { box-sizing: border-box; }
 
@@ -45,45 +23,21 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hi); text-decoration: underline; }
 
-/* ---- title bar ---- */
+/* ---- brand wordmark (docs-specific) ---- */
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  background: #0f0f0f;
-  border-bottom: 1px solid var(--line);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
-  padding: 12px 1.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-}
-
-.brand {
+/* The product name is FemtoLCC - mixed case, as on the silkscreen and in every
+   other mention. Only the accent on "LCC" is a brand treatment; the casing is not. */
+.brand-wordmark {
   font-family: var(--display);
   font-weight: 800;
   font-optical-sizing: auto;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   letter-spacing: 0.01em;
-  color: var(--text);
-  transition: opacity 0.2s ease;
+  line-height: 1;
+  padding-left: 12px;
+  border-left: 1px solid var(--line-hi);
 }
-.brand:hover { opacity: 0.8; text-decoration: none; color: var(--text); }
 .brand-mark.alt { color: var(--accent); }
-
-.topnav { display: flex; gap: 10px; }
-.topnav a {
-  color: var(--nav-text);
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.01em;
-  padding: 6px 10px;
-  border-radius: 8px;
-}
-.topnav a:hover { color: var(--accent-hi); background: var(--wash); text-decoration: none; }
-.topnav a:first-child { color: var(--accent); }
 
 /* ---- shell ---- */
 
@@ -96,7 +50,7 @@ a:hover { color: var(--accent-hi); text-decoration: underline; }
   padding: 2rem 1.5rem 4rem;
 }
 
-.sidebar { position: sticky; top: 5rem; align-self: start; }
+.sidebar { position: sticky; top: 7rem; align-self: start; }
 .nav-label {
   font-family: var(--display);
   font-weight: 600;
@@ -134,19 +88,25 @@ a:hover { color: var(--accent-hi); text-decoration: underline; }
 /* ---- prose ---- */
 
 .prose { min-width: 0; }
+
+/* Hold running text to a readable measure. Tables, code blocks and figures are
+   deliberately left full width - they need the room, prose does not. */
+.prose p,
+.prose li,
+.prose blockquote { max-width: 70ch; }
 .prose h1 {
   font-family: var(--display);
   font-weight: 800;
   font-optical-sizing: auto;
   font-size: 2.1rem;
   line-height: 1.15;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.9rem;
 }
 .prose h2 {
   font-family: var(--display);
   font-weight: 700;
   font-size: 1.4rem;
-  margin: 2.5rem 0 0.8rem;
+  margin: 2.5rem 0 1.4rem;
   padding-bottom: 0.4rem;
   border-bottom: 1px solid var(--line);
 }
@@ -154,9 +114,9 @@ a:hover { color: var(--accent-hi); text-decoration: underline; }
   font-family: var(--display);
   font-weight: 600;
   font-size: 1.1rem;
-  margin: 1.9rem 0 0.5rem;
+  margin: 1.9rem 0 0.9rem;
 }
-.lede { font-size: 1.08rem; color: var(--text-muted); margin-top: 0; }
+.lede { font-size: 1.08rem; color: var(--text-muted); margin-top: 0; max-width: 62ch; }
 
 code {
   font-family: var(--mono);
@@ -247,6 +207,8 @@ blockquote p { margin: 0; }
   box-shadow: var(--shadow);
   padding: 0.7rem;
   margin: 0.5rem 0 1.75rem;
+  max-height: 540px;
+  object-fit: contain;
 }
 
 .cardlist { list-style: none; padding: 0; }

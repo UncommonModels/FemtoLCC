@@ -1,9 +1,14 @@
-<header class="topbar">
-  <a class="brand" href="{{ .Site.Home.RelPermalink }}">
-    <span class="brand-mark">Femto</span><span class="brand-mark alt">LCC</span>
-  </a>
-  <nav class="topnav">
-    <a href="{{ .Site.Params.orgURL }}">{{ .Site.Params.org }}</a>
-    <a href="{{ .Site.Params.repo }}">GitHub</a>
-  </nav>
+<header class="title-bar">
+  <div class="title-bar-inner">
+    <a class="brand" href="{{ .Site.Home.RelPermalink }}">
+      <img class="title-logo" src="{{ "img/UncommonModels_with_text.svg" | relURL }}"
+           alt="{{ .Site.Params.org }} logo">
+      <span class="brand-wordmark"><span class="brand-mark">Femto</span><span class="brand-mark alt">LCC</span></span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="{{ .Site.Params.orgURL }}">{{ .Site.Params.org }}</a>
+      <a class="nav-link" href="{{ .Site.Params.repo }}">GitHub</a>
+      <a class="btn btn-primary" href="mailto:sales@uncommonmodels.com">Contact</a>
+    </div>
+  </div>
 </header>

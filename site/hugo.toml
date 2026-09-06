@@ -4,6 +4,10 @@ title = 'FemtoLCC'
 enableGitInfo = false
 
 [params]
+  # Shared Uncommon Models brand layer, published from the org site. Override for
+  # local work against an unreleased brand.css:
+  #   HUGO_PARAMS_BRANDCSS=http://127.0.0.1:4000/css/brand.css hugo server
+  brandCSS = 'https://www.uncommonmodels.com/css/brand.css'
   description = 'An ESP32-C6 based LCC node with four block driver channels and an isolated DCC input.'
   repo = 'https://github.com/UncommonModels/FemtoLCC'
   org = 'Uncommon Models'
