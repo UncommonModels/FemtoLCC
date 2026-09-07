@@ -53,3 +53,6 @@ __pycache__/
 
 # JLCPCB upload staging: duplicates of files already under production/
 production/upload/
+
+# VS Code Local History extension
+.history/
