@@ -41,6 +41,12 @@ public:
     // is reporting overcurrent, overtemperature or undervoltage.
     bool faulted(uint8_t channel) const;
 
+    // Full voltage for a moment on a channel that is not passing DCC through,
+    // without changing the mode, direction or duty the channel reports. This
+    // is the occupancy detector's pulse; nothing else should use it. The
+    // channel goes back to whatever it was driving when `on` is false.
+    void probe(uint8_t channel, bool on);
+
     // Current through the block, from the driver's IPROPI output.
     // Returns milliamps, using the DRV8874 IPROPI ratio and the 1.43k sense
     // resistor fitted at R7/R9/R11/R13.

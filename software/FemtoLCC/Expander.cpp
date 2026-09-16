@@ -4,8 +4,9 @@
 // MCP23018 registers, IOCON.BANK = 0 (the reset default).
 static const uint8_t REG_IODIRA = 0x00;
 static const uint8_t REG_IODIRB = 0x01;
+static const uint8_t REG_GPPUA  = 0x0C;
 static const uint8_t REG_GPIOA  = 0x12;
-static const uint8_t REG_GPIOB  = 0x13;
+static const uint8_t REG_OLATA  = 0x14;
 static const uint8_t REG_OLATB  = 0x15;
 
 Expander::Expander(uint8_t address)
@@ -60,8 +61,12 @@ bool Expander::setPortADirection(uint8_t mask) {
     return writeRegister(REG_IODIRA, mask);
 }
 
+bool Expander::setPortAPullups(uint8_t mask) {
+    return writeRegister(REG_GPPUA, mask);
+}
+
 bool Expander::writePortA(uint8_t value) {
-    return writeRegister(REG_GPIOA, value);
+    return writeRegister(REG_OLATA, value);
 }
 
 bool Expander::readPortA(uint8_t& value) {

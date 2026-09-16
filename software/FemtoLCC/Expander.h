@@ -3,6 +3,10 @@
 // Port B carries the block driver control lines that did not fit on the ESP32:
 // the four dcc_en lines, three of the four dir lines, and the status LED.
 // Port A is uncommitted general-purpose I/O brought out as /P0../P7.
+//
+// The MCP23018's outputs are open drain. A low bit sinks current; a high bit
+// lets the line float, so "on" for a load wired from the supply into the pin is
+// a low bit. The internal pull-ups (GPPU) are about 100k.
 
 #pragma once
 
@@ -21,9 +25,14 @@ public:
     bool getPortBBit(uint8_t bit) const;
     bool flush();
 
-    // Port A — general-purpose. Direction is per-bit: true means input.
+    // Port A — general-purpose. Direction is per-bit: a 1 means input.
     bool setPortADirection(uint8_t mask);
+    // Pull-ups per bit: a 1 turns the pull-up on.
+    bool setPortAPullups(uint8_t mask);
+    // Writes the output latch. Bits that are inputs ignore it, so this never
+    // disturbs an input.
     bool writePortA(uint8_t value);
+    // Reads the pins as they are, inputs and outputs both.
     bool readPortA(uint8_t& value);
 
     bool ok() const { return ok_; }

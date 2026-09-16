@@ -81,6 +81,18 @@ void Channels::setDuty(uint8_t channel, uint8_t duty) {
     }
 }
 
+// The detection pulse rides on the PWM line alone. Off and DC both leave
+// dcc_en low and dir where it was, so a pulse needs no expander write - it
+// costs no I2C transaction - and it cannot jog a motor back and forth by
+// flipping polarity between one pulse and the next.
+void Channels::probe(uint8_t channel, bool on) {
+    if (channel >= NUM_CHANNELS || mode_[channel] == ChannelMode::DCC) {
+        return;
+    }
+    const uint8_t rest = mode_[channel] == ChannelMode::DC ? duty_[channel] : 0;
+    ledcWrite(PIN_PWM[channel], on ? 255 : rest);
+}
+
 void Channels::allOff() {
     for (int i = 0; i < NUM_CHANNELS; ++i) {
         setMode(i, ChannelMode::Off);

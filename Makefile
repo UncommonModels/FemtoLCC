@@ -174,7 +174,7 @@ drc:
 firmware:
 	$(MAKE) -C $(SOFTWARE) build
 
-## flash: build and upload the firmware (PORT=/dev/ttyUSB0)
+## flash: build and upload the firmware (PORT=/dev/ttyACM0)
 flash:
 	$(MAKE) -C $(SOFTWARE) flash
 

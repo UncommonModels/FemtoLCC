@@ -4,8 +4,15 @@
 # `make flash`, `make monitor`.
 
 SKETCH      := FemtoLCC
-FQBN        ?= esp32:esp32:esp32c6
-PORT        ?= /dev/ttyUSB0
+
+# CDCOnBoot=cdc puts Serial on the C6's native USB at P1. Without it the console
+# goes to UART0 on the J1 header and the USB port carries no console output.
+FQBN        ?= esp32:esp32:esp32c6:CDCOnBoot=cdc
+
+# The native USB Serial/JTAG port enumerates as ttyACM, not ttyUSB. With more
+# than one board attached, pass the stable name instead:
+#   PORT=/dev/serial/by-id/usb-Espressif_USB_JTAG_serial_debug_unit_<MAC>-if00
+PORT        ?= /dev/ttyACM0
 BAUD        ?= 115200
 ARDUINO_CLI ?= arduino-cli
 

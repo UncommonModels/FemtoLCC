@@ -17,8 +17,16 @@
 // Oversampling and a per-channel baseline tare are what make the bottom two rows
 // workable at all. Use 4.7k or lower wheelsets; 10k will not detect reliably.
 //
-// Detection only means anything while the block is energised. A channel that is
-// Off carries no current, so its state is reported as Unknown rather than Clear.
+// Detection only means anything while current can flow. A block with power on
+// it is measured as it runs. A block that is switched off is pulsed instead:
+// full voltage for a couple of milliseconds every few hundred, sampled during
+// the pulse, then off again. That is what lets a dispatcher which leaves
+// unowned blocks dead still see which of them a train is standing in. The
+// pulse is far too short to move a locomotive.
+//
+// A channel that cannot be pulsed - pulsing turned off, not a track block,
+// passing DCC through, or a driver that has faulted - reports Unknown, as
+// before, because absence of current proves nothing.
 
 #pragma once
 
@@ -49,18 +57,44 @@ public:
     // True exactly once per transition, so the caller can fire an LCC event.
     bool takeTransition(uint8_t channel, BlockState& newState);
 
-    // Thresholds in milliamps. Occupied must exceed `occupied`; the block is not
-    // released until it falls below `clear`. The gap is hysteresis and stops a
-    // block on the threshold from chattering.
+    // Thresholds in milliamps, per channel or for all four. Occupied must
+    // exceed `occupied`; the block is not released until it falls below
+    // `clear`. The gap is hysteresis and stops a block on the threshold from
+    // chattering.
+    void setThresholds(uint8_t channel, uint32_t occupied, uint32_t clear);
     void setThresholds(uint32_t occupied, uint32_t clear);
+
+    // A channel that is not a track block - a turnout motor, or unused - is
+    // not watched, and reports Unknown.
+    void setEnabled(uint8_t channel, bool enabled);
 
     // A block is declared occupied after `onMs` above threshold, and released
     // only after `offMs` below it. The release delay is the important one: it
     // rides over dirty track and the gaps between wheelsets.
     void setDelays(uint32_t onMs, uint32_t offMs);
 
+    // Detection while the block is switched off: pulse it for `pulseUs` every
+    // `intervalMs` and sample the current during the pulse. The four channels
+    // are spread across the interval, so only one is ever pulsing.
+    void setPulseDetect(uint8_t channel, bool enabled, uint16_t pulseUs, uint16_t intervalMs);
+
+    // Whether the channel is set to pulse, and whether a driver fault has
+    // stopped it from doing so until the channel is driven again.
+    bool pulseDetect(uint8_t channel) const;
+    bool pulseStopped(uint8_t channel) const;
+
+    // One pulse now, whatever the settings say, with the reading in milliamps:
+    // for bench testing from the console. The detector's own state is left
+    // alone. False if the channel cannot be pulsed at this moment.
+    bool pulseOnce(uint8_t channel, uint32_t& milliamps);
+
 private:
     uint32_t readAveraged(uint8_t channel) const;
+
+    // One pulse, sampled while it is applied, in ADC counts above the tare.
+    uint32_t pulseAndRead(uint8_t channel);
+    bool canPulse(uint8_t channel) const;
+    void setUnknown(uint8_t channel);
 
     Channels& channels_;
     uint8_t cursor_;                        // channel being sampled this pass
@@ -71,9 +105,16 @@ private:
     BlockState pending_[NUM_CHANNELS];
     uint32_t since_[NUM_CHANNELS];          // when the pending state began
     bool transition_[NUM_CHANNELS];
+    bool enabled_[NUM_CHANNELS];
 
-    uint32_t occupiedMa_;
-    uint32_t clearMa_;
+    bool pulseEnabled_[NUM_CHANNELS];       // detect while the block is off
+    uint16_t pulseUs_[NUM_CHANNELS];
+    uint16_t pulseIntervalMs_[NUM_CHANNELS];
+    uint32_t lastPulse_[NUM_CHANNELS];
+    bool pulseFaulted_[NUM_CHANNELS];       // a pulse tripped the driver
+
+    uint32_t occupiedMa_[NUM_CHANNELS];
+    uint32_t clearMa_[NUM_CHANNELS];
     uint32_t onMs_;
     uint32_t offMs_;
 };
