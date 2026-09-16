@@ -118,9 +118,8 @@ consistency rule JLC requires: `pos2jlc.py` drops those placements from the CPL,
 print what they dropped:
 
 ```
-pos2jlc: not placed, fitted by hand: J2
-pos2jlc: not placed, no part assigned: H1, H2, H3, H4, J1, JP6, SW1
-bom2jlc: not assembled, absent from the CPL: J1, J2, JP6, SW1
+pos2jlc: not placed, no part assigned: H1, H2, H3, H4, J1, J2, JP6
+bom2jlc: not assembled, absent from the CPL: J1, J2, JP6
 ```
 
 An `Assemble` column in the mapping controls this. Blank means assemble it provided an
@@ -128,11 +127,12 @@ LCSC number is assigned; `no` keeps it out of both files. A part absent from the
 is never placed — anything JLC assembles needs a part number, so an unknown part is a gap
 to fix rather than a default to assume. That is what keeps the mounting holes out.
 
-**`tools/do-not-populate.txt`** lists designators left deliberately empty. They are
-dropped from the assembly BOM and the CPL but kept in the reference list, which documents
-every position on the board. Use it when the part mapping cannot separate the position
-from its neighbours — it is keyed on value plus footprint, so `R5` and `R14` (both 47 k
-0402) are indistinguishable to it. Setting DNP on the symbol in KiCad has the same effect,
+**`tools/do-not-populate.txt`** lists designators left deliberately empty. It is empty
+at the moment. Listed parts are dropped from the assembly BOM and the CPL but kept in the
+reference list, which documents every position on the board. Use it when the part
+mapping cannot separate the position from its neighbours. The mapping is keyed on value
+plus footprint, so it cannot tell `R5` from `R14`, for example (both 47 k 0402), and
+leaving out one of a matching pair has to be done by designator here. Setting DNP on the symbol in KiCad has the same effect,
 since both exports pass `--exclude-dnp`.
 
 Run `make bom-full` for the unfiltered parts list covering the hand-fitted parts too.

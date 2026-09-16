@@ -55,4 +55,4 @@ __pycache__/
 production/upload/
 
 # VS Code Local History extension
-.history/
+.history

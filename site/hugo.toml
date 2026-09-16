@@ -47,3 +47,13 @@ enableGitInfo = false
   name = 'Build workflow'
   url = '/docs/workflow/'
   weight = 5
+
+[[menu.main]]
+  name = 'Configuration'
+  url = '/docs/configuration/'
+  weight = 6
+
+[[menu.main]]
+  name = 'Errata'
+  url = '/docs/errata/'
+  weight = 7
