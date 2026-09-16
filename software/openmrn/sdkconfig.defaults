@@ -1,0 +1,37 @@
+# Defaults common to every target. Target-specific settings go in
+# sdkconfig.defaults.<target>, which ESP-IDF picks up automatically.
+
+# Partition table: see partitions.csv.
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# OpenMRN is tested against the Arduino core's tick rate; matching it keeps the
+# executor's timer behaviour the same as the AOLCB firmware's.
+CONFIG_FREERTOS_HZ=1000
+
+# loop_executor() never returns, so the OpenMRN executor runs in the main task.
+# It needs far more stack than the 3.5 kB default, and it must not be watched by
+# the task watchdog.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE=4096
+CONFIG_ESP_TASK_WDT_INIT=n
+
+# The TWAI driver is exposed through the VFS and read with ::select().
+CONFIG_VFS_SUPPORT_SELECT=y
+
+# GridConnect over TCP: the hub accepts several clients at once.
+CONFIG_LWIP_MAX_SOCKETS=16
+CONFIG_LWIP_SO_REUSE=y
+
+# OpenMRN spawns its threads through pthreads.
+CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT=4096
+
+# The stack is big; optimise for size so it fits the 3 MB app partition with
+# room to spare.
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_COMPILER_CXX_EXCEPTIONS=n
+CONFIG_COMPILER_CXX_RTTI=n
+
+# SPIFFS holds cdi.xml and the configuration file.
+CONFIG_SPIFFS_OBJ_NAME_LEN=64

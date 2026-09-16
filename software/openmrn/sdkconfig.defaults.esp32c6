@@ -1,0 +1,15 @@
+# ESP32-C6 — the FemtoLCC board itself.
+#
+# Console: UART0 primary, native USB Serial/JTAG secondary, which is what the
+# Arduino core does for the AOLCB firmware with CDCOnBoot=cdc. On the C6 UART0
+# defaults to GPIO 16 (TX) and 17 (RX), which is exactly the programming and
+# console header at J1 in board.h, so output goes to both the header and the
+# USB-C port at P1.
+#
+# Do not turn the UART console off entirely: ESP-IDF 5.2's esp_hw_support
+# sleep_modes.c uses CONFIG_ESP_CONSOLE_UART_BAUDRATE unconditionally and fails
+# to compile when no UART console is configured.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_NUM=0
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG=y

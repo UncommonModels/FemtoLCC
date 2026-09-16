@@ -1,0 +1,7 @@
+## OpenMRN's Esp32WiFiManager advertises the node over mDNS. mDNS was moved out
+## of ESP-IDF into a managed component in the 5.x series, so it is pulled in
+## here rather than being a plain `REQUIRES mdns`.
+dependencies:
+  espressif/mdns: "^1.2.0"
+  idf:
+    version: ">=5.0"
