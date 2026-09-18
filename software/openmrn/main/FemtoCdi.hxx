@@ -1,13 +1,11 @@
 // The FemtoLCC settings, as CDI groups.
 //
-// This covers the same ground as ../FemtoLCC/Cdi.cpp — four outputs, eight I/O
-// pins and WiFi — but where that file is hand-written XML whose offsets are
-// kept in step with Config.h by a checking script, these macros render the XML
-// and lay out the bytes from one description. There is nothing to keep in step.
+// These macros render the XML a configuration tool reads *and* lay out the
+// bytes of memory space 253, both from this one description, so the form and
+// the storage behind it cannot drift apart.
 //
-// What is deliberately not here, and is in the AOLCB firmware: the I/O
-// expansion boards and the servo/light boards on the Qwiic connector, and the
-// USB GridConnect setting. See README.md.
+// Everything the board can be set to is here: the four outputs, the eight I/O
+// pins, the Qwiic I/O and servo boards, and WiFi. See README.md.
 //
 //   Uncommon Models — https://uncommonmodels.com
 
@@ -17,6 +15,7 @@
 #include "openlcb/ConfigRepresentation.hxx"
 #include "openlcb/MemoryConfig.hxx"
 
+#include "Config.h"
 #include "board.h"
 
 namespace openlcb
@@ -68,6 +67,40 @@ static const char FEMTO_INVERT_MAP[] =
     "<relation><property>0</property><value>Normal</value></relation>"
     "<relation><property>1</property><value>Inverted</value></relation>";
 
+/// PulseDetect. Note that On is 0, so a board whose bytes were never written
+/// still pulses.
+static const char FEMTO_PULSE_DETECT_MAP[] =
+    "<relation><property>0</property><value>On</value></relation>"
+    "<relation><property>1</property><value>Off</value></relation>";
+
+/// IoBoardType.
+static const char FEMTO_IO_BOARD_MAP[] =
+    "<relation><property>0</property><value>None</value></relation>"
+    "<relation><property>1</property><value>MCP23017</value></relation>"
+    "<relation><property>2</property><value>PCF8574</value></relation>"
+    "<relation><property>3</property><value>TCA9534 / PCA9554</value></relation>";
+
+/// ServoBoardType.
+static const char FEMTO_SERVO_BOARD_MAP[] =
+    "<relation><property>0</property><value>None</value></relation>"
+    "<relation><property>1</property><value>PCA9685</value></relation>";
+
+/// ServoUse. The choice also says where the channel goes at power-on.
+static const char FEMTO_SERVO_USE_MAP[] =
+    "<relation><property>0</property><value>Unused</value></relation>"
+    "<relation><property>1</property><value>Servo turnout, closed at power-on</value></relation>"
+    "<relation><property>2</property><value>Servo turnout, thrown at power-on</value></relation>"
+    "<relation><property>3</property><value>Servo turnout, left alone</value></relation>"
+    "<relation><property>4</property><value>Light, off at power-on</value></relation>"
+    "<relation><property>5</property><value>Light, on at power-on</value></relation>"
+    "<relation><property>6</property><value>Inverted light, off at power-on</value></relation>"
+    "<relation><property>7</property><value>Inverted light, on at power-on</value></relation>";
+
+/// Whether a servo keeps its pulses once it is in position.
+static const char FEMTO_SERVO_REST_MAP[] =
+    "<relation><property>0</property><value>Stop pulses</value></relation>"
+    "<relation><property>1</property><value>Hold position</value></relation>";
+
 /// On/off, for WiFi.
 static const char FEMTO_ENABLE_MAP[] =
     "<relation><property>0</property><value>Off</value></relation>"
@@ -97,6 +130,25 @@ CDI_GROUP_ENTRY(clear_ma, Uint16ConfigEntry, Name("Clear below (mA)"),
     Description("The block is not reported clear until it falls below this. "
                 "The gap between the two is what stops a block on the "
                 "threshold from chattering."));
+CDI_GROUP_ENTRY(detect_while_off, Uint8ConfigEntry,
+    Name("Detect while off"), Default(0),
+    MapValues(FEMTO_PULSE_DETECT_MAP),
+    Description("Pulse the block while it is switched off, so it can still be "
+                "detected. On by default. Turn it off if lit stock in the "
+                "block flickers. It is ignored unless the output is a track "
+                "block, and no pulse is ever sent while the block is powered, "
+                "is passing DCC through, or its driver has faulted."));
+CDI_GROUP_ENTRY(pulse_len_100us, Uint8ConfigEntry,
+    Name("Pulse length (100 us)"), Default(20), Min(0), Max(50),
+    Description("How long each pulse lasts, in hundreds of microseconds: 20 "
+                "is 2 ms, the default. A longer pulse reads more steadily, a "
+                "shorter one is less visible in lit stock. 10 to 50; 0 uses "
+                "the default."));
+CDI_GROUP_ENTRY(pulse_interval_ms, Uint16ConfigEntry,
+    Name("Pulse interval (ms)"), Default(300), Min(0), Max(10000),
+    Description("How often each block is pulsed. 300 ms is the default, and "
+                "the four outputs are spread across the interval so only one "
+                "is ever pulsing. 100 to 10000; 0 uses the default."));
 CDI_GROUP_ENTRY(event_on, EventConfigEntry, Name("Power on (DC)"),
     Description("Acted on: powers the block with DC."));
 CDI_GROUP_ENTRY(event_off, EventConfigEntry, Name("Power off"),
@@ -195,16 +247,102 @@ CDI_GROUP_ENTRY(event_off, EventConfigEntry, Name("Output off"),
 CDI_GROUP_END();
 
 // ---------------------------------------------------------------------------
+// I/O expansion boards on the Qwiic connector J3
+//
+// Each line is set up exactly like an I/O pin, so PinConfig is reused: unused,
+// input, input with pull-up or output, with the same polarity, debounce and
+// events. The 8-line chips use lines 1-8 and ignore the rest.
+// ---------------------------------------------------------------------------
+
+/// The lines on one I/O expansion board. Named because CDI_GROUP_ENTRY is a
+/// variadic macro and would split RepeatedGroup<PinConfig, XIO_LINES> at its
+/// comma.
+using IoBoardLines = RepeatedGroup<PinConfig, XIO_LINES>;
+
+CDI_GROUP(IoBoardConfig);
+CDI_GROUP_ENTRY(type, Uint8ConfigEntry, Name("Board type"), Default(0),
+    MapValues(FEMTO_IO_BOARD_MAP),
+    Description("The chip on the board. MCP23017 has 16 lines with pull-ups; "
+                "PCF8574 and TCA9534 have 8."));
+CDI_GROUP_ENTRY(address, Uint8ConfigEntry, Name("I2C address"), Default(0x21),
+    Min(0), Max(127),
+    Description("The address set on the board, as a number: 33 is 0x21. "
+                "MCP23017 may use 0x21-0x27; PCF8574 and TCA9534 may also use "
+                "0x38-0x3F for the A versions. 0x20 belongs to the expander on "
+                "the FemtoLCC itself and may not be used. A factory reset numbers the "
+                "boards up from this one: board 1 gets 0x21, board 2 0x22, "
+                "and so on."));
+CDI_GROUP_ENTRY(lines, IoBoardLines, Name("Lines"), RepName("Line"));
+CDI_GROUP_END();
+
+// ---------------------------------------------------------------------------
+// Servo and light boards on the Qwiic connector J3
+// ---------------------------------------------------------------------------
+
+CDI_GROUP(ServoChannelConfig);
+CDI_GROUP_ENTRY(description, StringConfigEntry<20>, Name("Description"),
+    Description("What this channel drives."));
+CDI_GROUP_ENTRY(use, Uint8ConfigEntry, Name("Use"), Default(0),
+    MapValues(FEMTO_SERVO_USE_MAP),
+    Description("What the channel drives, and where it goes when the board "
+                "starts. A servo left alone gets no signal until its first "
+                "command."));
+CDI_GROUP_ENTRY(event_throw, EventConfigEntry, Name("Throw / light on"),
+    Description("Acted on: throws the servo, or switches the light on."));
+CDI_GROUP_ENTRY(event_close, EventConfigEntry, Name("Close / light off"),
+    Description("Acted on: closes the servo, or switches the light off."));
+CDI_GROUP_ENTRY(event_thrown, EventConfigEntry, Name("Thrown"),
+    Description("Sent when a servo turnout reaches its thrown position."));
+CDI_GROUP_ENTRY(event_closed, EventConfigEntry, Name("Closed"),
+    Description("Sent when a servo turnout reaches its closed position."));
+CDI_GROUP_ENTRY(time_ms, Uint16ConfigEntry, Name("Travel or fade time (ms)"),
+    Default(1000), Min(0), Max(60000),
+    Description("How long a servo takes from one position to the other, so it "
+                "moves slowly like a real turnout motor, or how long a light "
+                "takes to fade. 0 moves at full speed."));
+CDI_GROUP_ENTRY(closed_us, Uint16ConfigEntry, Name("Closed position (us)"),
+    Default(1300), Min(0), Max(3000),
+    Description("The pulse width for closed. 1500 is the middle of a servo's "
+                "travel. To reverse a servo, swap this with thrown."));
+CDI_GROUP_ENTRY(thrown_us, Uint16ConfigEntry, Name("Thrown position (us)"),
+    Default(1700), Min(0), Max(3000),
+    Description("The pulse width for thrown."));
+CDI_GROUP_ENTRY(brightness, Uint8ConfigEntry, Name("Brightness"), Default(255),
+    Description("How bright a light is when on. The scale follows the eye, so "
+                "128 looks about half as bright as 255."));
+CDI_GROUP_END();
+
+/// The channels on one servo/light board; named for the same reason.
+using ServoBoardChannels = RepeatedGroup<ServoChannelConfig, SERVO_CHANNELS>;
+
+CDI_GROUP(ServoBoardConfig);
+CDI_GROUP_ENTRY(type, Uint8ConfigEntry, Name("Board type"), Default(0),
+    MapValues(FEMTO_SERVO_BOARD_MAP));
+CDI_GROUP_ENTRY(address, Uint8ConfigEntry, Name("I2C address"), Default(0x40),
+    Min(0), Max(127),
+    Description("The address set on the board, as a number: 64 is 0x40. A "
+                "PCA9685 may use 0x40-0x7F. Avoid 0x70, which every PCA9685 "
+                "also answers to. A factory reset numbers the boards up from this "
+                "one: board 1 gets 0x40 and board 2 0x41."));
+CDI_GROUP_ENTRY(hold, Uint8ConfigEntry, Name("Servos at rest"), Default(0),
+    MapValues(FEMTO_SERVO_REST_MAP),
+    Description("Stop pulses switches a servo's signal off once it is in "
+                "position, so it does not buzz; the throwbar holds the "
+                "points."));
+CDI_GROUP_ENTRY(channels, ServoBoardChannels, Name("Channels"),
+    RepName("Channel"));
+CDI_GROUP_END();
+
+// ---------------------------------------------------------------------------
 // WiFi
 //
 // OpenMRN's own WiFiConfiguration (included by the segment below) covers the
 // hub and uplink behaviour but not which network to join, because
 // Esp32WiFiManager takes those as constructor arguments. This group supplies
-// them, so that the network can be set from a configuration tool as it can on
-// the AOLCB firmware.
+// them, so that the network can be set from a configuration tool.
 //
-// Unlike the AOLCB firmware, the password is NOT write-only: it reads back as
-// it was written. See README.md.
+// The password is write-only: main.cxx wraps memory space 253 so that these
+// bytes always read back blank. See README.md.
 // ---------------------------------------------------------------------------
 
 CDI_GROUP(WiFiCredentialsConfig);
@@ -214,7 +352,11 @@ CDI_GROUP_ENTRY(enable, Uint8ConfigEntry, Name("WiFi"), Default(0),
 CDI_GROUP_ENTRY(ssid, StringConfigEntry<33>, Name("Network name"),
     Description("The name of the WiFi network to join."));
 CDI_GROUP_ENTRY(password, StringConfigEntry<64>, Name("Password"),
-    Description("Readable by anyone who can read this node's configuration."));
+    Description("Write-only: it is stored but always reads back blank, so it "
+                "cannot be recovered from the node. A configuration tool that "
+                "verifies what it wrote will report a mismatch on this field "
+                "only, which is expected. Leave it alone to keep the current "
+                "password; write a new one to change it."));
 CDI_GROUP_ENTRY(hostname, StringConfigEntry<32>, Name("Host name prefix"),
     Description("Prefix for the name the board announces over mDNS; the node "
                 "ID is appended to it. Leave blank for \"femtolcc-\"."));

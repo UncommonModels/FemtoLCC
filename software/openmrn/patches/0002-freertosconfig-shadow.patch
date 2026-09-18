@@ -1,4 +1,4 @@
---- /home/npaladin/git/openmrn/include/freertos/FreeRTOSConfig.h	2025-02-02 15:38:21.750613077 -0500
+--- openmrn/include/freertos/FreeRTOSConfig.h	2026-09-17 22:15:22.215329555 -0400
 +++ patches/overrides/freertos/FreeRTOSConfig.h	2026-09-15 22:59:27.699782131 -0400
 @@ -1,381 +1,24 @@
 -/*

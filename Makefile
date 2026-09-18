@@ -13,6 +13,7 @@ PROD      := production
 GERBERDIR := $(PROD)/gerbers
 SITE      := site
 SOFTWARE  := software
+FIRMWARE  := $(SOFTWARE)/openmrn
 PUBLIC    := $(SITE)/public
 
 # Prefer a native kicad-cli, fall back to the Flatpak.
@@ -166,25 +167,25 @@ drc:
 # --------------------------------------------------------------------------
 # Firmware
 #
-# Delegated to software/Makefile, which owns the arduino-cli invocation. Pass
-# PORT= and FQBN= straight through.
+# Delegated to software/openmrn/Makefile, which owns the idf.py invocation.
+# Pass PORT= and TARGET= straight through.
 # --------------------------------------------------------------------------
 
 ## firmware: compile the ESP32-C6 firmware
 firmware:
-	$(MAKE) -C $(SOFTWARE) build
+	$(MAKE) -C $(FIRMWARE) build
 
-## flash: build and upload the firmware (PORT=/dev/ttyACM0)
+## flash: build and upload the firmware over USB-C at P1 (PORT=/dev/ttyACM0)
 flash:
-	$(MAKE) -C $(SOFTWARE) flash
+	$(MAKE) -C $(FIRMWARE) flash
 
-## monitor: open the firmware serial console
+## monitor: open the firmware console — a USB-serial adapter on J1, not P1
 monitor:
-	$(MAKE) -C $(SOFTWARE) monitor
+	$(MAKE) -C $(FIRMWARE) monitor
 
-## firmware-deps: install the Arduino core the firmware needs
+## firmware-deps: fetch the OpenMRN submodule and check the ESP-IDF install
 firmware-deps:
-	$(MAKE) -C $(SOFTWARE) deps
+	$(MAKE) -C $(FIRMWARE) deps
 
 # --------------------------------------------------------------------------
 # Documentation site
@@ -228,7 +229,7 @@ upload: $(ZIP) $(BOM) $(CPL)
 clean:
 	rm -rf $(GERBERDIR) $(UPLOAD) $(ZIP) $(BOM) $(BOM_FULL) $(CPL) $(RENDER) $(RENDER_BOT) $(SCH_PDF)
 	rm -rf $(PUBLIC) $(SITE)/resources $(SITE)/.hugo_build.lock
-	$(MAKE) -C $(SOFTWARE) clean
+	$(MAKE) -C $(FIRMWARE) clean
 	rm -f $(PROD)/.bom-flat.csv $(PROD)/.pos-raw.csv
 	rm -f $(PROD)/$(PROJECT)-erc.rpt $(PROD)/$(PROJECT)-drc.rpt
 

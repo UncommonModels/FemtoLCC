@@ -1,4 +1,4 @@
-// The Arduino calls the copied hardware drivers make, over ESP-IDF.
+// The Arduino calls the hardware drivers make, over ESP-IDF.
 //
 // See Arduino.h and Wire.h for what this is and why it exists. Nothing here is
 // general: every function is present because Channels, Occupancy, Turnouts,
@@ -12,15 +12,21 @@
 
 #include "board.h"
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "driver/gpio.h"
+#include "driver/gptimer.h"
+#include "esp_attr.h"
+#include "freertos_drivers/esp32/Esp32Gpio.hxx"
 #include "driver/i2c.h"
 #include "driver/ledc.h"
 #include "esp_adc/adc_oneshot.h"
 #include "esp_err.h"
 #include "esp_idf_version.h"
 #include "esp_log.h"
+#include "esp_rom_sys.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -46,12 +52,59 @@ void delay(uint32_t ms)
     vTaskDelay(pdMS_TO_TICKS(ms));
 }
 
+void delayMicroseconds(uint32_t us)
+{
+    // A busy-wait, as on Arduino: these are a few hundred microseconds at most
+    // and far shorter than a scheduler tick.
+    esp_rom_delay_us(us);
+}
+
 // ---------------------------------------------------------------------------
 // GPIO
+//
+// The board's directly-attached digital pins go through OpenMRN's Esp32Gpio
+// rather than straight to ESP-IDF, so the pin definitions, the safe power-on
+// level and the compile-time checks on pin validity are the library's. That
+// needs patch 0005, which teaches Esp32Gpio the C6: without it the ESP32
+// fallback rejects GPIO 6, 7 and 9, which are three of the four nFAULT lines.
+//
+// The dispatch below exists because the hardware drivers index pins at run time
+// (PIN_NFAULT[i]) while Esp32Gpio is a compile-time template. Anything not on
+// this board's map falls back to a plain gpio_config().
 // ---------------------------------------------------------------------------
+
+// Only on the C6, which is the board. These pin numbers are this board's, and
+// on another SoC they mean nothing: on the classic ESP32, GPIO6-11 are the
+// flash and Esp32Gpio's static_assert rightly refuses them. The fallback target
+// therefore uses the plain ESP-IDF path below.
+#if defined(CONFIG_IDF_TARGET_ESP32C6)
+#define FEMTO_USE_ESP32GPIO 1
+
+// Channel A's direction line; B, C and D are on the expander.
+GPIO_PIN(DirA, GpioOutputSafeLow, PIN_DIR_A);
+
+// DRV8874 nFAULT, open drain and active low, so each needs its pull-up.
+GPIO_PIN(FaultA, GpioInputPU, 6);
+GPIO_PIN(FaultB, GpioInputPU, 7);
+GPIO_PIN(FaultC, GpioInputPU, 9);
+GPIO_PIN(FaultD, GpioInputPU, 23);
+#endif // CONFIG_IDF_TARGET_ESP32C6
 
 void pinMode(int pin, uint8_t mode)
 {
+#if FEMTO_USE_ESP32GPIO
+    // The board's own pins, set up the way OpenMRN defines them.
+    if (pin == PIN_DIR_A)
+    {
+        DirA_Pin::hw_init();
+        return;
+    }
+    if (pin == PIN_NFAULT[0]) { FaultA_Pin::hw_init(); return; }
+    if (pin == PIN_NFAULT[1]) { FaultB_Pin::hw_init(); return; }
+    if (pin == PIN_NFAULT[2]) { FaultC_Pin::hw_init(); return; }
+    if (pin == PIN_NFAULT[3]) { FaultD_Pin::hw_init(); return; }
+#endif
+
     gpio_config_t cfg;
     memset(&cfg, 0, sizeof(cfg));
     cfg.pin_bit_mask = 1ULL << pin;
@@ -83,11 +136,25 @@ void pinMode(int pin, uint8_t mode)
 
 void digitalWrite(int pin, uint8_t value)
 {
+#if FEMTO_USE_ESP32GPIO
+    if (pin == PIN_DIR_A)
+    {
+        DirA_Pin::set(value != 0);
+        return;
+    }
+#endif
     gpio_set_level((gpio_num_t)pin, value ? 1 : 0);
 }
 
 int digitalRead(int pin)
 {
+#if FEMTO_USE_ESP32GPIO
+    if (pin == PIN_NFAULT[0]) { return FaultA_Pin::get() ? 1 : 0; }
+    if (pin == PIN_NFAULT[1]) { return FaultB_Pin::get() ? 1 : 0; }
+    if (pin == PIN_NFAULT[2]) { return FaultC_Pin::get() ? 1 : 0; }
+    if (pin == PIN_NFAULT[3]) { return FaultD_Pin::get() ? 1 : 0; }
+    if (pin == PIN_DIR_A) { return DirA_Pin::instance()->read() ? 1 : 0; }
+#endif
     return gpio_get_level((gpio_num_t)pin);
 }
 
@@ -272,6 +339,32 @@ bool ledcWrite(int pin, uint32_t duty)
 }
 
 // ---------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------
+
+Print Console;
+
+int Print::printf(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    const int n = vprintf(format, args);
+    va_end(args);
+    return n;
+}
+
+size_t Print::print(const char *s)
+{
+    return (size_t)fputs(s, stdout);
+}
+
+size_t Print::println(const char *s)
+{
+    const int n = printf("%s\n", s);
+    return n < 0 ? 0 : (size_t)n;
+}
+
+// ---------------------------------------------------------------------------
 // I2C
 // ---------------------------------------------------------------------------
 
@@ -439,4 +532,144 @@ int TwoWire::read()
         return -1;
     }
     return rxBuffer_[rxIndex_++];
+}
+
+// ---------------------------------------------------------------------------
+// The hardware timer, over gptimer
+//
+// See Arduino.h. Only what DCCSource uses is implemented, and only in the way
+// it uses it: one timer, counting microseconds, with a one-shot alarm re-armed
+// from inside the interrupt handler.
+//
+// The alarm is re-armed by the handler itself, which gptimer explicitly allows:
+// gptimer_set_alarm_action, gptimer_start, gptimer_stop and
+// gptimer_set_raw_count are all documented as callable from interrupt context.
+//
+// NOT interrupt-safe against a disabled flash cache. CONFIG_GPTIMER_ISR_IRAM_SAFE
+// would require the callback and everything it reaches to be resident in RAM,
+// and DCCSource's handler reaches static helpers and memcpy in DCCSource.cpp,
+// which is not annotated for IRAM. The consequence is that nothing may write
+// flash while the DCC source is running; see the interlock in FemtoController
+// and the README. Annotating DCCSource.cpp would lift that restriction: it is
+// open work, not a constraint.
+// ---------------------------------------------------------------------------
+
+/// The one timer. Arduino hands back an opaque pointer, so this stands in for
+/// it; DCCSource only ever passes it straight back.
+struct hw_timer_t
+{
+    gptimer_handle_t handle;
+    void (*callback)(void);
+    bool running;
+};
+
+static hw_timer_t s_timer = { nullptr, nullptr, false };
+
+static bool IRAM_ATTR timer_on_alarm(gptimer_handle_t,
+    const gptimer_alarm_event_data_t *, void *)
+{
+    if (s_timer.callback != nullptr)
+    {
+        s_timer.callback();
+    }
+    // No task was woken: the handler does its work inline, as Arduino's does.
+    return false;
+}
+
+hw_timer_t *timerBegin(uint32_t frequency)
+{
+    if (s_timer.handle != nullptr)
+    {
+        return &s_timer;        // only one is ever asked for
+    }
+
+    gptimer_config_t cfg;
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.clk_src = GPTIMER_CLK_SRC_DEFAULT;
+    cfg.direction = GPTIMER_COUNT_UP;
+    cfg.resolution_hz = frequency;
+
+    if (gptimer_new_timer(&cfg, &s_timer.handle) != ESP_OK)
+    {
+        ESP_LOGE(TAG, "no free hardware timer for the DCC waveform");
+        s_timer.handle = nullptr;
+        return nullptr;
+    }
+    s_timer.callback = nullptr;
+    s_timer.running = false;
+    return &s_timer;
+}
+
+void timerAttachInterrupt(hw_timer_t *timer, void (*fn)(void))
+{
+    if (timer == nullptr || timer->handle == nullptr)
+    {
+        return;
+    }
+    timer->callback = fn;
+
+    gptimer_event_callbacks_t cbs;
+    memset(&cbs, 0, sizeof(cbs));
+    cbs.on_alarm = timer_on_alarm;
+    ESP_ERROR_CHECK(
+        gptimer_register_event_callbacks(timer->handle, &cbs, nullptr));
+    ESP_ERROR_CHECK(gptimer_enable(timer->handle));
+    ESP_ERROR_CHECK(gptimer_start(timer->handle));
+    timer->running = true;
+}
+
+void timerDetachInterrupt(hw_timer_t *timer)
+{
+    if (timer == nullptr || timer->handle == nullptr)
+    {
+        return;
+    }
+    if (timer->running)
+    {
+        gptimer_stop(timer->handle);
+        timer->running = false;
+    }
+    gptimer_disable(timer->handle);
+    timer->callback = nullptr;
+}
+
+void timerAlarm(hw_timer_t *timer, uint64_t ticks, bool autoreload,
+    uint64_t reload_count)
+{
+    if (timer == nullptr || timer->handle == nullptr)
+    {
+        return;
+    }
+    gptimer_alarm_config_t alarm;
+    memset(&alarm, 0, sizeof(alarm));
+    alarm.alarm_count = ticks;
+    alarm.reload_count = reload_count;
+    alarm.flags.auto_reload_on_alarm = autoreload ? 1 : 0;
+    gptimer_set_alarm_action(timer->handle, &alarm);
+}
+
+void timerWrite(hw_timer_t *timer, uint64_t value)
+{
+    if (timer == nullptr || timer->handle == nullptr)
+    {
+        return;
+    }
+    gptimer_set_raw_count(timer->handle, value);
+}
+
+void timerEnd(hw_timer_t *timer)
+{
+    if (timer == nullptr || timer->handle == nullptr)
+    {
+        return;
+    }
+    if (timer->running)
+    {
+        gptimer_stop(timer->handle);
+        timer->running = false;
+    }
+    gptimer_disable(timer->handle);
+    gptimer_del_timer(timer->handle);
+    timer->handle = nullptr;
+    timer->callback = nullptr;
 }

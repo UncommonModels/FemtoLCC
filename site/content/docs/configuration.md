@@ -1,6 +1,6 @@
 ---
 title: "Configuration"
-description: "Setting up the outputs, I/O pins, expansion boards and WiFi from JMRI, and connecting over the LCC bus, WiFi or USB."
+description: "Setting up the outputs, I/O pins, expansion boards and WiFi from JMRI, and connecting over the LCC bus, USB or WiFi."
 weight: 6
 ---
 
@@ -8,6 +8,10 @@ FemtoLCC is configured over LCC itself, the same way as any other LCC node: a
 configuration tool reads the node's description of its settings and draws a form.
 Nothing needs reflashing to turn a block output into a turnout driver, wire a push
 button, or put the board on WiFi.
+
+There is no serial console to type commands at, and no settings page served by the
+board. Everything below is done from JMRI, or from any other OpenLCB configuration
+tool.
 
 ## Connecting JMRI
 
@@ -17,13 +21,16 @@ handiest.
 
 | Link | JMRI connection |
 |---|---|
-| USB | LCC, **CAN via GridConnect**, the board's serial port |
-| WiFi | LCC, **CAN via GridConnect Network Interface**, `femtolcc-xxxx.local`, port `12021` |
+| USB | LCC, **CAN via GridConnect**, the board's USB port |
+| WiFi | LCC, **CAN via GridConnect Network Interface**, `femtolcc-<node-id>.local`, port `12021` |
 | LCC bus | any LCC adapter JMRI already supports, plugged into the bus |
 
 In JMRI: *Edit → Preferences → Connections*, add a connection, choose **LCC** as
 the system manufacturer (called **OpenLCB** in older versions), then the
 connection type above.
+
+WiFi is off on a new board, so the first time you set one up, connect over USB or
+over the LCC bus.
 
 ### Over USB
 
@@ -32,42 +39,59 @@ Plug the board into the computer with USB-C at `P1`. It appears as
 Choose that port in JMRI. The speed setting does not matter: it is a USB port, not
 a real serial line.
 
-The same port is the board's console. When JMRI connects and starts sending LCC
-traffic the board notices, sends LCC traffic back, and stops printing its own
-status messages so they do not get in JMRI's way. The board then works as an
+That port carries **only** LCC traffic, in GridConnect form. The board works as an
 LCC-USB adapter: JMRI sees the whole CAN bus, and anything connected over WiFi.
-
-The **USB → GridConnect output** setting chooses how this works: *Automatic*
-(the default, as above), *Always on*, or *Off* to keep the port a plain console.
+It is not a console — opening it in a terminal shows GridConnect frames, not
+status messages. The board's own messages come out of the 6-pin UART header at
+`J1` instead; see [The console](#the-console).
 
 ### Over WiFi
 
-WiFi is off until you set it up. The quickest way is the console — open the USB
-port in any serial terminal and type:
+Fill in the **WiFi network** section of the configuration form and restart the
+board. WiFi settings are read once at start-up, so they only take effect after a
+restart.
 
-```
-wifi MyNetwork my network password
-```
+| Setting | |
+|---|---|
+| **WiFi** | *On* or *Off*. Off is the default |
+| **Network name** | the network to join |
+| **Password** | write-only: it is stored, but always reads back blank |
+| **Host name prefix** | the start of the name the board announces over mDNS; blank means `femtolcc-` |
 
-The first word is the network name; everything after it is the password. The
-board saves them and joins straight away, printing its address:
+The password reading back blank is deliberate, so it cannot be recovered from the
+board by anyone who can reach it over LCC. A configuration tool that checks what
+it wrote will report a mismatch on that one field, which is expected. Leave the
+field alone to keep the current password; write a new one to change it.
 
-```
-WiFi: connected, IP 192.168.1.57, femtolcc-0001.local
-LCC hub listening on port 12021
-```
+The board announces itself over mDNS as the prefix followed by its node ID, so a
+board that is node `02.01.57.A7.CD.94` is `femtolcc-020157a7cd94.local`. Every
+board has a different name, because each takes its node ID from the chip inside
+it. You never have to be told the name: JMRI shows the node ID in the node list,
+and the board prints it on the `J1` console at start-up, so the name follows from
+it. If the name does not resolve on your network, use the board's IP address —
+from your router's list of clients — with port `12021` instead.
 
-You can also fill in the **WiFi** section of the configuration form and reboot
-the board. Either way, point JMRI at `femtolcc-0001.local` (the number is the end of
-the board's node ID; the console command `wifi` shows it) or at the IP address, port
-`12021`.
+#### Hub and uplink
 
-By default the board **acts as a hub**: JMRI, and up to three other tools, connect
-to it. Set **Hub mode** to *Connect to a hub* to have it connect out to an existing
-LCC hub instead, such as JMRI's own hub server. Give the hub's address as an IP
-address — a name has to be looked up first, which can pause the board.
+The **WiFi hub and uplink** section decides what the board does with the network.
+*Connection Mode* is the main setting:
 
-`wifi off` turns WiFi off again.
+| Connection Mode | What the board does |
+|---|---|
+| Uplink only | Connects out to an existing LCC hub. **The default** |
+| Hub only | Accepts connections; JMRI and other tools connect *to* the board |
+| Hub+Uplink | Both |
+| Disabled | Neither; WiFi carries no LCC traffic |
+
+A new board is set to **Uplink only**, so it looks for a hub to join — JMRI's own
+hub server, for instance. Under *Node Uplink Configuration*, *Search Mode* chooses
+between finding that hub over mDNS (*Auto Address*, by *mDNS Service*) and being
+told where it is (*Manual Address*, an *IP Address* and *Port Number*). An IP
+address is the more predictable of the two, since a name has to be looked up
+first.
+
+Set *Connection Mode* to **Hub only** to have JMRI connect to the board instead.
+*Hub Listener Port* is the port it listens on, `12021` by default.
 
 ## Opening the configuration
 
@@ -75,17 +99,9 @@ In JMRI choose *LCC → Configure Nodes*. The board appears as **FemtoLCC** by
 Uncommon Models; select it and press *Open Configuration*. Change what you need
 and press *Write* beside a setting, or *Save Changes* for the lot.
 
-### In a web browser
-
-Once the board is on WiFi you can skip JMRI: open `http://femtolcc-0001.local/`
-(or the board's IP address) and the same settings appear as a web page, served
-by the board itself. Change what you need and press *Save*. The page also has
-*Reboot* and *Factory reset* buttons. Anyone on your layout network can open it,
-just as anyone there could reach the board from JMRI.
-
-Settings for the outputs, I/O pins and expansion boards take effect a moment
-after they are written — no restart. WiFi settings take effect after a restart: use *Restart*
-in the configuration window, or unplug the board.
+Settings for the outputs, I/O pins and expansion boards take effect a moment after
+they are written — no restart. WiFi settings take effect after a restart: use
+*Restart* in the configuration window, or unplug the board.
 
 Give the board a name and description in the **Node** section at the top; JMRI
 shows them in the node list.
@@ -133,14 +149,11 @@ What it can do is make lit stock flicker. An LED coach standing in the block is
 lit for two milliseconds each time, which in a dark room some people will see.
 If that bothers you — or you would simply rather the board left dead track dead
 — set *Detect while off* to **Off** for that output. The block then reports its
-state only while it has power. `pulse a off` on the console does the same.
+state only while it has power.
 
-These settings are in their own **Detection while off** section of the form, one
-entry per output, rather than under *Track block*: they belong there, but the
-bytes they use sit at the end of the board's configuration space. *Pulse length*
-and *Pulse interval* are there too — the defaults, 2 ms every 300 ms, suit
-everything the board can detect, and the four outputs are spread across the
-interval so only one is ever pulsing.
+*Pulse length* and *Pulse interval* are alongside it. The defaults, 2 ms every
+300 ms, suit everything the board can detect, and the four outputs are spread
+across the interval so only one is ever pulsing.
 
 ### Turnout motor
 
@@ -215,10 +228,7 @@ switches on the board, and the form's *I2C address* must match it.
   A2 4, A3 8, A4 16 and A5 32. Avoid `0x70`, which every PCA9685 also answers
   until the board has set it up.
 - Two boards set to the same address, or an address the chip cannot have, are
-  refused. The board is reported on the console and not used.
-
-The console command `i2c` lists every address that answers, and which board
-each one is.
+  refused. The board is reported on the `J1` console and not used.
 
 ### Wiring
 
@@ -266,10 +276,10 @@ Set a channel's *Use* to a *Servo turnout* choice. The choice also says where th
 turnout goes when the board starts: closed, thrown, or left alone. The form numbers
 channels 1 to 16, so channel 1 is the output marked 0 on the board.
 
-- *Closed position* and *Thrown position* are pulse widths in microseconds. Find
-  them with the console: `servo 1 1 1500` sends board 1, channel 1 to the middle,
-  and you can try other values until the points sit right. To reverse a servo,
-  swap the two.
+- *Closed position* and *Thrown position* are pulse widths in microseconds. 1500 µs
+  is the middle of a servo's travel and a sensible starting point: write a value,
+  send the channel its *Throw* or *Close* event to watch it move, and adjust until
+  the points sit right. To reverse a servo, swap the two.
 - *Travel or fade time* is how long the servo takes from one position to the other,
   so it moves slowly like a real turnout motor.
 - *Thrown* and *Closed* are sent when the servo gets there.
@@ -291,11 +301,12 @@ brightness some people, and most cameras, will see a flicker.
 
 ### When a board is missing
 
-A configured board that does not answer is reported once on the console
-(`I/O board 1 (MCP23017 at 0x21) not answering`) and shows as `NOT ANSWERING` in
-`status`. The FemtoLCC tries it again every few seconds. When it answers, the
-board is set up and its outputs and servos go where they were last commanded.
-Until then, its inputs and servos report their state as unknown.
+A configured board that does not answer is reported on the `J1` console
+(`I/O board 1 (MCP23017 at 0x21) not answering`). The FemtoLCC tries it again
+every few seconds. When it answers, the board is set up and its outputs and servos
+go where they were last commanded. Until then, its inputs and servos answer
+**unknown** when a panel or JMRI asks their state, rather than claiming a state
+they cannot see.
 
 ## Events
 
@@ -327,8 +338,11 @@ value unique to the board: its node ID followed by a two-byte suffix.
 | Servo turnout thrown | `0D.ii` | sent |
 | Servo turnout closed | `0E.ii` | sent |
 
-*n* is 0–3 for outputs A–D, and *p* is 0–7 for pins `P0`–`P7`. With the placeholder
-node ID `02.01.57.00.00.01`, *block A power on* is `02.01.57.00.00.01.01.00`.
+*n* is 0–3 for outputs A–D, and *p* is 0–7 for pins `P0`–`P7`. Every board has its
+own node ID, taken from the chip inside it, so on a board that is
+`02.01.57.A7.CD.94`, *block A power on* is `02.01.57.A7.CD.94.01.00`. JMRI shows
+the board's node ID in the node list, and the board prints it on the `J1` console
+at start-up.
 
 For the expansion boards *ii* is 16 × (board − 1) + (line − 1) in hex, with the
 board and line (or channel) numbered as in the form: board 1, line 1 is `00`,
@@ -346,42 +360,35 @@ whether a block is occupied, or which way a turnout is set, gets an answer.
 
 The configuration decides what each output is for. A dispatcher program such as
 olcbweb can then drive the track blocks moment to moment — DC speed and direction
-for the train in each block, or DCC — through a separate live-control area the
-board offers over LCC. Nothing it sets is saved, and it holds only while the
-dispatcher keeps in touch: if the dispatcher stops, the blocks it was powering
-switch off within a few seconds. Details are in the firmware
-[README](https://github.com/UncommonModels/FemtoLCC/tree/main/software).
+for the train in each block — through a separate live-control area the board
+offers over LCC. Output A can also generate DCC, with locomotive address, speed,
+direction and functions driven from the same area, so a dispatcher can run DCC
+locomotives as well as DC blocks.
+
+Nothing a dispatcher sets is saved, and it holds only while the dispatcher keeps
+in touch: if the dispatcher stops, the blocks it was powering switch off within a
+few seconds, and any locomotives running under DCC are sent an emergency stop.
+
+The board does not host LCC train nodes, so a JMRI throttle cannot drive a
+locomotive through it directly; that is what the live-control area is for.
+Details are in the firmware
+[README](https://github.com/UncommonModels/FemtoLCC/tree/main/software/openmrn).
 
 ## Starting over
 
-*Factory Reset* in JMRI's configuration window, or `factory` on the console, puts
-every setting back to its default — names, events and WiFi included — and
-restarts the board.
+*Factory Reset* in JMRI's configuration window puts every setting back to its
+default — names, events and WiFi included — and restarts the board. The event IDs
+are re-derived from the board's node ID, so anything on the layout pointing at the
+old ones needs re-pointing.
 
 ## The console
 
-The USB port doubles as a serial console, at any speed, one command per line. The
-configuration commands:
+The 6-pin UART header at `J1` is a plain serial console at 115200 baud. It is
+**output only**: there are no commands to type. It carries the start-up banner —
+including the board's node ID, and the WiFi network it is joining, if any — and
+messages about expansion boards appearing and disappearing.
 
-| Command | Effect |
-|---|---|
-| `config` | Show the current configuration |
-| `status` | Show each output's state, current, faults and whether it is pulsed while off, and the I/O pins |
-| `pulse` | Show whether each output is pulsed while it is switched off |
-| `pulse a on` / `pulse a off` | Turn that on or off for output A |
-| `pulse a now` | Pulse output A once and show what it drew, in mA |
-| `wifi` | Show WiFi status: network, address, connected clients |
-| `wifi <name> <password>` | Save a network, turn WiFi on and join it |
-| `wifi off` | Turn WiFi off |
-| `usb` | Show the USB GridConnect mode |
-| `usb gridconnect on\|off\|auto` | Set it |
-| `a throw` / `a close` | Move output A's turnout |
-| `i2c` | List what answers on the Qwiic connector, and the configured boards |
-| `x 1 5 on` / `x 1 5 off` | Switch I/O expansion board 1, line 5 |
-| `servo 1 3 1500` | Send board 1, channel 3 a 1500 µs pulse, to find a position (`0` stops it) |
-| `servo 1 3 throw` | Move it as its events would: `throw`, `close`, `on` or `off` |
-| `factory` | Factory reset |
-| `reboot` | Restart |
-
-The full list is in the firmware
-[README](https://github.com/UncommonModels/FemtoLCC/tree/main/software).
+Use it when something is not behaving and you want to see what the board thinks is
+going on. You need a USB-serial adapter for it; the USB-C port at `P1` is not a
+console, because it carries LCC traffic. Flashing new firmware, though, does go
+through `P1`.

@@ -1,6 +1,6 @@
---- /home/npaladin/git/openmrn/src/freertos_drivers/esp32/Esp32HardwareTwai.cxx	2025-02-02 15:38:21.762612802 -0500
-+++ patches/overrides/freertos_drivers/esp32/Esp32HardwareTwai.cxx	2026-09-15 22:59:27.711782057 -0400
-@@ -75,6 +75,31 @@
+--- openmrn/src/freertos_drivers/esp32/Esp32HardwareTwai.cxx	2026-09-17 22:15:22.227329484 -0400
++++ patches/overrides/freertos_drivers/esp32/Esp32HardwareTwai.cxx	2026-09-17 22:17:58.139456907 -0400
+@@ -78,6 +78,31 @@
  #include "utils/Atomic.hxx"
  #include "utils/logging.h"
  
@@ -32,7 +32,7 @@
  namespace openmrn_arduino
  {
  
-@@ -721,7 +746,7 @@
+@@ -738,7 +763,7 @@
      {
          ESP_EARLY_LOGV(TWAI_LOG_TAG, "periph-reset");
          twai_hal_prepare_for_reset(&twai.context);
@@ -41,7 +41,7 @@
          twai_hal_recover_from_reset(&twai.context);
          twai.stats.rx_lost += twai_hal_get_reset_lost_rx_cnt(&twai.context);
  #if CONFIG_VFS_SUPPORT_SELECT
-@@ -956,7 +981,7 @@
+@@ -975,7 +1000,7 @@
  {
      LOG(VERBOSE, "ESP-TWAI: Allocating ISR");
      ESP_ERROR_CHECK(
@@ -50,7 +50,7 @@
              nullptr, &twai.isr_handle));
  }
  
-@@ -966,18 +991,18 @@
+@@ -985,18 +1010,18 @@
          "ESP-TWAI: Configuring TWAI (TX:%d, RX:%d, EXT-CLK:%d, BUS-CTRL:%d)",
          txPin_, rxPin_, extClockPin_, busStatusPin_);
      gpio_set_pull_mode((gpio_num_t)txPin_, GPIO_FLOATING);
@@ -72,7 +72,7 @@
              false);
          esp_rom_gpio_pad_select_gpio((gpio_num_t)extClockPin_);
      }
-@@ -985,7 +1010,7 @@
+@@ -1004,7 +1029,7 @@
      if (busStatusPin_ != GPIO_NUM_NC)
      {
          gpio_set_pull_mode((gpio_num_t)busStatusPin_, GPIO_FLOATING);
@@ -81,7 +81,7 @@
              false, false);
          esp_rom_gpio_pad_select_gpio((gpio_num_t)busStatusPin_);
      }
-@@ -1004,8 +1029,8 @@
+@@ -1023,8 +1048,8 @@
      vfs.flags = ESP_VFS_FLAG_DEFAULT;
      ESP_ERROR_CHECK(esp_vfs_register(vfsPath_, &vfs, this));
  

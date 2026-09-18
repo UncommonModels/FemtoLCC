@@ -1,0 +1,3 @@
+[submodule "software/openmrn/openmrn"]
+	path = software/openmrn/openmrn
+	url = https://github.com/UncommonModels/openmrn.git

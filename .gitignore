@@ -44,9 +44,6 @@ site/.hugo_build.lock
 # Hand-maintained LCSC part assignments: an input to the BOM/CPL tools, not an export
 !tools/lcsc-parts.csv
 
-# Firmware build output (arduino-cli --build-path)
-software/build/
-
 # Python bytecode caches
 __pycache__/
 *.pyc

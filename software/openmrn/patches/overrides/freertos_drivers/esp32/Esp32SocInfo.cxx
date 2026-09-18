@@ -149,6 +149,36 @@ static constexpr const char * const RESET_REASONS[] =
     "USB JTAG Reset",           // USB_JTAG_CHIP_RESET      22
     "Power Glitch Reset",       // POWER_GLITCH_RESET       23
 };
+#elif defined(CONFIG_IDF_TARGET_ESP32C6)
+/// ESP32-C6 SoC reset reasons.
+static constexpr const char * const RESET_REASONS[] =
+{
+    "unknown",                  // NO_MEAN                  0
+    "power on reset",           // POWERON_RESET            1
+    "unknown",                  // no key                   2
+    "software reset",           // RTC_SW_SYS_RESET         3
+    "unknown",                  // no key                   4
+    "deep sleep reset",         // DEEPSLEEP_RESET          5
+    "reset (SLC)",              // SDIO_RESET               6
+    "watchdog reset (group0)",  // TG0WDT_SYS_RESET         7
+    "watchdog reset (group1)",  // TG1WDT_SYS_RESET         8
+    "RTC system reset",         // RTCWDT_SYS_RESET         9
+    "unknown",                  // no key                   10
+    "WDT Timer group0 reset",   // TG0WDT_CPU_RESET         11
+    "software reset (CPU)",     // RTC_SW_CPU_RESET         12
+    "RTC WDT reset",            // RTCWDT_CPU_RESET         13
+    "unknown",                  // no key                   14
+    "Brownout reset",           // RTCWDT_BROWN_OUT_RESET   15
+    "RTC Reset (Normal)",       // RTCWDT_RTC_RESET         16
+    "WDT Timer group1 reset",   // TG1WDT_CPU_RESET         17
+    "WDT Reset",                // SUPER_WDT_RESET          18
+    "unknown",                  // no key                   19
+    "eFuse Reset",              // EFUSE_RESET              20
+    "USB UART Reset",           // USB_UART_CHIP_RESET      21
+    "USB JTAG Reset",           // USB_JTAG_CHIP_RESET      22
+    "unknown",                  // no key                   23
+    "JTAG Reset",               // JTAG_RESET               24
+};
 #elif defined(CONFIG_IDF_TARGET_ESP32H2)
 /// ESP32-H2 SoC reset reasons.
 static constexpr const char * const RESET_REASONS[] =
@@ -209,38 +239,6 @@ static constexpr const char * const RESET_REASONS[] =
     "unknown",                  // no key                   0x17
     "JTAG Reset"                // JTAG_RESET               0x18
 };
-#elif defined(CONFIG_IDF_TARGET_ESP32C6)
-/// ESP32-C6 SoC reset reasons. Values from
-/// components/esp_rom/include/esp32c6/rom/rtc.h; the gaps are codes the ROM
-/// does not define.
-static constexpr const char * const RESET_REASONS[] =
-{
-    "unknown",                      // NO_MEAN                   0
-    "power on reset",               // POWERON_RESET             1
-    "unknown",                      // no key                    2
-    "software reset",               // RTC_SW_SYS_RESET          3
-    "unknown",                      // no key                    4
-    "deep sleep reset",             // DEEPSLEEP_RESET           5
-    "SDIO reset",                   // SDIO_RESET                6
-    "watchdog reset (group0)",      // TG0WDT_SYS_RESET          7
-    "watchdog reset (group1)",      // TG1WDT_SYS_RESET          8
-    "RTC system reset",             // RTCWDT_SYS_RESET          9
-    "unknown",                      // no key                   10
-    "WDT Timer group0 reset (CPU)", // TG0WDT_CPU_RESET         11
-    "software reset (CPU)",         // RTC_SW_CPU_RESET         12
-    "RTC WDT reset (CPU)",          // RTCWDT_CPU_RESET         13
-    "unknown",                      // no key                   14
-    "Brownout reset",               // RTCWDT_BROWN_OUT_RESET   15
-    "RTC Reset (Normal)",           // RTCWDT_RTC_RESET         16
-    "WDT Timer group1 reset (CPU)", // TG1WDT_CPU_RESET         17
-    "WDT Reset",                    // SUPER_WDT_RESET          18
-    "unknown",                      // no key                   19
-    "eFuse Reset",                  // EFUSE_RESET              20
-    "USB UART Reset",               // USB_UART_CHIP_RESET      21
-    "USB JTAG Reset",               // USB_JTAG_CHIP_RESET      22
-    "unknown",                      // no key                   23
-    "JTAG Reset",                   // JTAG_RESET               24
-};
 #endif // IDF Target
 
 /// Mapping of known ESP chip id values.
@@ -261,6 +259,9 @@ static constexpr const char * const CHIP_NAMES[] =
     "Unknown",          // 11 Unknown (placeholder)
     "ESP32-C2",         // 12 CHIP_ESP32C2
     "ESP32-C6",         // 13 CHIP_ESP32C6
+    "Unknown",          // 14 Unknown (placeholder)
+    "Unknown",          // 15 Unknown (placeholder)
+    "ESP32-H2",         // 16 CHIP_ESP32H2
 };
 
 uint8_t Esp32SocInfo::print_soc_info()

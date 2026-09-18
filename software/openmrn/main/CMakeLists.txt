@@ -1,28 +1,38 @@
 # The FemtoLCC application.
 #
-# Channels.cpp, Occupancy.cpp, Turnouts.cpp, IoPins.cpp and Expander.cpp are
-# byte-identical copies of the hardware drivers in ../../FemtoLCC — see
-# ../sync-drivers.sh. They compile unchanged because Arduino.h, Wire.h and
-# Config.h in this directory supply what they expect; ArduinoCompat.cxx
-# implements the first two over ESP-IDF.
+# The .cpp files below are the hardware drivers. They are written against a
+# small slice of the Arduino API rather than ESP-IDF directly, because that is
+# the API they were first written for; Arduino.h, Wire.h and Config.h in this
+# directory declare exactly what they use and ArduinoCompat.cxx implements it
+# over ESP-IDF. They are ordinary sources of this firmware: edit them here.
 
 idf_component_register(
     SRCS
         "main.cxx"
         "FemtoController.cxx"
+        "FemtoBits.cxx"
+        "LiveControl.cxx"
+        "ModuleStore.cxx"
         "ArduinoCompat.cxx"
-        # Copies from ../../FemtoLCC — do not edit here.
+        "Config.cxx"
+        # The hardware drivers; see the note above.
         "Channels.cpp"
         "Occupancy.cpp"
         "Turnouts.cpp"
         "IoPins.cpp"
         "Expander.cpp"
+        "I2cBus.cpp"
+        "IoBoards.cpp"
+        "ServoBoards.cpp"
+        "DCCSource.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES
         openmrn
         driver
         esp_adc
+        # esp_mac.h: the node ID is derived from the chip's base MAC.
+        esp_hw_support
         esp_wifi
         nvs_flash
         spiffs

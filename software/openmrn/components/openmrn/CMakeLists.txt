@@ -4,8 +4,8 @@
 # etc/esp-idf/CMakeLists.txt, with three deliberate differences:
 #
 #   1. The source tree is not copied into the project. OPENMRN_PATH points at a
-#      checkout, so the two stay independent and the checkout is never written
-#      to.
+#      checkout — by default the pinned ../openmrn submodule — so the two stay
+#      independent and the checkout is never written to.
 #   2. A few source groups are dropped — see the notes beside the exclusions.
 #   3. Individual files can be replaced by patched copies under
 #      ../../patches/overrides, which is how the ESP32-C6 fixes are applied
@@ -64,6 +64,10 @@ set(SRCS
     ${OPENMRNPATH}/src/openlcb/EventHandlerContainer.cxx
     ${OPENMRNPATH}/src/openlcb/EventHandlerTemplates.cxx
     ${OPENMRNPATH}/src/openlcb/EventService.cxx
+    # New since the previous baseline: SimpleStack's CanPhysicalIf is built on
+    # it, so leaving it out is an undefined reference at link time rather than a
+    # missing feature.
+    ${OPENMRNPATH}/src/openlcb/FilteringCanHubFlow.cxx
     ${OPENMRNPATH}/src/openlcb/If.cxx
     ${OPENMRNPATH}/src/openlcb/IfCan.cxx
     ${OPENMRNPATH}/src/openlcb/IfImpl.cxx

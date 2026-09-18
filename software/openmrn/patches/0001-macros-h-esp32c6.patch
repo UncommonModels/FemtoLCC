@@ -1,5 +1,5 @@
---- /home/npaladin/git/openmrn/src/utils/macros.h	2025-02-02 15:38:21.787612230 -0500
-+++ patches/overrides/utils/macros.h	2026-09-15 22:56:17.135941967 -0400
+--- openmrn/src/utils/macros.h	2026-09-17 22:15:22.259329296 -0400
++++ patches/overrides/utils/macros.h	2026-09-17 22:17:58.137456918 -0400
 @@ -102,6 +102,12 @@
  #include <esp32s3/rom/ets_sys.h>
  #elif defined(CONFIG_IDF_TARGET_ESP32C3)

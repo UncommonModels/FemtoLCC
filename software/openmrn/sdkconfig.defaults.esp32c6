@@ -1,15 +1,26 @@
 # ESP32-C6 — the FemtoLCC board itself.
 #
-# Console: UART0 primary, native USB Serial/JTAG secondary, which is what the
-# Arduino core does for the AOLCB firmware with CDCOnBoot=cdc. On the C6 UART0
-# defaults to GPIO 16 (TX) and 17 (RX), which is exactly the programming and
-# console header at J1 in board.h, so output goes to both the header and the
-# USB-C port at P1.
+# Console: UART0 only. On the C6 UART0 defaults to GPIO 16 (TX) and 17 (RX),
+# which is exactly the programming and console header at J1 in board.h.
 #
-# Do not turn the UART console off entirely: ESP-IDF 5.2's esp_hw_support
-# sleep_modes.c uses CONFIG_ESP_CONSOLE_UART_BAUDRATE unconditionally and fails
-# to compile when no UART console is configured.
+# Keep UART0 as the primary console. ESP-IDF 5.2's esp_hw_support sleep_modes.c
+# uses CONFIG_ESP_CONSOLE_UART_BAUDRATE unconditionally (line 134), and that
+# symbol only exists while a UART console is configured, so selecting any other
+# primary fails to compile. This is a property of the *primary* setting alone:
+# the secondary is switched off below and the build is fine.
 CONFIG_ESP_CONSOLE_UART_DEFAULT=y
 CONFIG_ESP_CONSOLE_UART_NUM=0
 CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+# The USB Serial/JTAG port carries GridConnect (see main.cxx). It would be
+# tidier to switch its console off entirely, but ESP-IDF compiles the VFS that
+# provides /dev/usbserjtag only when that port is a console (components/vfs/
+# CMakeLists.txt: the source is added for CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG or
+# the secondary). With it off, the device does not exist, OpenMRN's
+# add_gridconnect_port() fails its open, and HASSERT reboots the board in a
+# loop. So the secondary console stays on to get the device, and the logging
+# that would otherwise interleave with GridConnect frames is silenced instead:
+# the secondary console is output-only, so with nothing logged it writes
+# nothing. Diagnostics still go to UART0 at warning level and above.
 CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG=y
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y

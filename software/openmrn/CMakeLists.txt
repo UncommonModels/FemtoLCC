@@ -1,20 +1,21 @@
 # FemtoLCC — OpenMRN firmware.
 #
-# An ESP-IDF project (not an Arduino sketch) that runs the full OpenMRN stack
-# on the FemtoLCC board. The AOLCB-based firmware lives in ../FemtoLCC and is
-# built with arduino-cli; the two are alternatives, not layers.
+# An ESP-IDF project that runs the full OpenMRN stack on the FemtoLCC board.
+# This is the board's firmware; there is no other.
 #
 #   Uncommon Models — https://uncommonmodels.com
 
 cmake_minimum_required(VERSION 3.16)
 
-# Where the OpenMRN checkout lives. The Makefile passes this; override with
-# `make OPENMRN_PATH=/path/to/openmrn`.
+# Where the OpenMRN checkout lives. It defaults to the pinned submodule beside
+# this file, so the firmware is built against exactly the revision it was tested
+# against. The Makefile passes this; override with
+# `make OPENMRN_PATH=/path/to/openmrn` to build against a checkout of your own.
 if(NOT DEFINED OPENMRN_PATH)
     if(DEFINED ENV{OPENMRN_PATH})
         set(OPENMRN_PATH $ENV{OPENMRN_PATH})
     else()
-        set(OPENMRN_PATH "$ENV{HOME}/git/openmrn")
+        set(OPENMRN_PATH "${CMAKE_CURRENT_LIST_DIR}/openmrn")
     endif()
 endif()
 set(OPENMRN_PATH "${OPENMRN_PATH}" CACHE PATH "Path to the OpenMRN checkout")
@@ -22,8 +23,10 @@ set(OPENMRN_PATH "${OPENMRN_PATH}" CACHE PATH "Path to the OpenMRN checkout")
 if(NOT EXISTS "${OPENMRN_PATH}/src/openlcb/SimpleStack.hxx")
     message(FATAL_ERROR
         "OPENMRN_PATH=${OPENMRN_PATH} does not look like an OpenMRN checkout. "
-        "Pass -DOPENMRN_PATH=/path/to/openmrn or set OPENMRN_PATH in the "
-        "environment.")
+        "If that is the bundled submodule, it has not been fetched yet: run "
+        "`git submodule update --init --recursive` from the top of this "
+        "repository. Otherwise pass -DOPENMRN_PATH=/path/to/openmrn or set "
+        "OPENMRN_PATH in the environment.")
 endif()
 
 set(EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/components")
